@@ -1,12 +1,14 @@
-package agh.ics.oop.model;
+package agh.ics.oop.model.world_map;
 
+import agh.ics.oop.model.*;
 import agh.ics.oop.model.util.MapVisualizer;
 import agh.ics.oop.model.world_elements.Animal;
 import agh.ics.oop.model.world_elements.IWorldElement;
+import agh.ics.oop.model.world_elements.Vector2d;
 
 import java.util.*;
 
-public abstract class AbstractWorldMap implements IWorldMap {
+public abstract class AbstractWorldMap implements IWorldMap, IMoveValidator, IMoveTranslator {
     protected final MapVisualizer mapVisualizer;
     protected final Map<Vector2d, Animal> animalsMap;
     private final List<IMapChangeListener> listeners;
@@ -55,7 +57,7 @@ public abstract class AbstractWorldMap implements IWorldMap {
         Vector2d oldPosition = animal.getPosition();
         MapDirection oldOrientation = animal.getOrientation();
 
-        animal.move(direction, this);
+        animal.move(this, this);
 
         if(!animal.getPosition().equals(oldPosition)){
             animalsMap.remove(oldPosition);

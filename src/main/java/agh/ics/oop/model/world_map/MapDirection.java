@@ -1,14 +1,16 @@
-package agh.ics.oop.model;
+package agh.ics.oop.model.world_map;
+
+import agh.ics.oop.model.world_elements.Vector2d;
 
 public enum MapDirection {
     NORTH("North", new Vector2d(0, 1)),
     NORTH_EAST("NorthEast", new Vector2d(1, 1)),
-    NORTH_WEST("NorthWest", new Vector2d(-1, 1)),
     EAST("East", new Vector2d(1, 0)),
+    SOUTH_EAST("SouthEast", new Vector2d(1, -1)),
     SOUTH("South", new Vector2d(0, -1)),
     SOUTH_WEST("SouthWest", new Vector2d(-1, -1)),
-    SOUTH_EAST("SouthEast", new Vector2d(1, -1)),
-    WEST("West", new Vector2d(-1, 0));
+    WEST("West", new Vector2d(-1, 0)),
+    NORTH_WEST("NorthWest", new Vector2d(-1, 1));
 
     private final String stringRepresentation;
     private final Vector2d vectorRepresentation;
@@ -35,4 +37,7 @@ public enum MapDirection {
         return vectorRepresentation;
     }
 
+    public MapDirection shift(int value) {
+        return values()[(this.ordinal() + value) % values().length];
+    }
 }

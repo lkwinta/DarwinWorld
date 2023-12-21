@@ -1,8 +1,7 @@
 package agh.ics.oop.model.util;
 
-import agh.ics.oop.model.world_elements.IWorldElement;
-import agh.ics.oop.model.IWorldMap;
-import agh.ics.oop.model.Vector2d;
+import agh.ics.oop.model.world_map.IWorldMap;
+import agh.ics.oop.model.world_elements.Vector2d;
 
 /**
  * The map visualizer converts the {@link IWorldMap} map into a string

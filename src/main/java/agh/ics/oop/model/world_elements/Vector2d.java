@@ -1,4 +1,4 @@
-package agh.ics.oop.model;
+package agh.ics.oop.model.world_elements;
 
 import static java.lang.Math.max;
 import static java.lang.Math.min;

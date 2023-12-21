@@ -1,5 +1,8 @@
-package agh.ics.oop.model;
+package agh.ics.oop.model.world_map;
 
+import agh.ics.oop.model.MoveDirection;
+import agh.ics.oop.model.PositionAlreadyOccupiedException;
+import agh.ics.oop.model.world_elements.Vector2d;
 import agh.ics.oop.model.world_elements.IWorldElement;
 
 import java.util.List;
@@ -11,7 +14,7 @@ import java.util.UUID;
  *
  * @author apohllo, idzik
  */
-public interface IWorldMap extends IMoveValidator {
+public interface IWorldMap {
 
     /**
      * Place a T type object on the map.

@@ -1,9 +1,7 @@
 package agh.ics.oop.model.util;
 
-import agh.ics.oop.model.IMapChangeListener;
-import agh.ics.oop.model.world_elements.IWorldElement;
-import agh.ics.oop.model.IWorldMap;
-import agh.ics.oop.model.Vector2d;
+import agh.ics.oop.model.world_map.IMapChangeListener;
+import agh.ics.oop.model.world_map.IWorldMap;
 
 public class ConsoleMapDisplay implements IMapChangeListener {
     private int updateCounter = 0;
