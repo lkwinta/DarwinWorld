@@ -15,7 +15,9 @@ public class Genome {
 
     public Genome combineGenomes(Genome rightGenes, float percentOfLeftGenes) {
         int leftCount = (int)Math.ceil(length * percentOfLeftGenes);
-        int rightCount = (int)Math.ceil(length * (1 - percentOfLeftGenes));
+        int rightCount = (int)Math.floor(length * (1 - percentOfLeftGenes));
+
+        
     }
 
     public int getActiveGene(){
