@@ -5,7 +5,9 @@ import agh.ics.oop.model.PositionAlreadyOccupiedException;
 import agh.ics.oop.model.world_elements.Vector2d;
 import agh.ics.oop.model.world_elements.IWorldElement;
 
+import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 /**
@@ -24,10 +26,17 @@ public interface IWorldMap {
     void place(IWorldElement object) throws PositionAlreadyOccupiedException;
 
     /**
+     * Remove an object from world map
+     *
+     * @param object The object to remove from the map
+     **/
+    void remove(IWorldElement object);
+
+    /**
      * Moves an T object (if it is present on the map) according to specified direction.
      * If the move is not possible, this method has no effect.
      */
-    void move(IWorldElement object, MoveDirection direction);
+    void move(IWorldElement object);
 
     /**
      * Return true if given position on the map is occupied. Should not be
@@ -45,7 +54,7 @@ public interface IWorldMap {
      * @param position The position of the object.
      * @return animal or null if the position is not occupied.
      */
-    IWorldElement objectAt(Vector2d position);
+    Optional<List<IWorldElement>> objectsAt(Vector2d position);
 
     /**
      * Return all objects on the map

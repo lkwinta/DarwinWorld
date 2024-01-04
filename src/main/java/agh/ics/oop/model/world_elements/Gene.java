@@ -18,7 +18,7 @@ public enum Gene {
         if(above_or_below == 0){
             index = random.nextInt(0, this.ordinal());
         } else {
-            index = random.nextInt((this.ordinal() + 1)% values().length, 8);
+            index = random.nextInt((this.ordinal() + 1) % values().length,  values().length);
         }
 
         return values()[index];
@@ -26,5 +26,12 @@ public enum Gene {
 
     public static Gene getRandom() {
         return values()[random.nextInt(0, values().length)];
+    }
+
+    @Override
+    public String toString() {
+        return "Gene{" +
+                "name=" + this.name() +
+                '}';
     }
 }

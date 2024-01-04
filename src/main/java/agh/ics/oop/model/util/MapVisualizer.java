@@ -1,7 +1,10 @@
 package agh.ics.oop.model.util;
 
 import agh.ics.oop.model.world_map.IWorldMap;
+import agh.ics.oop.model.world_elements.IWorldElement;
 import agh.ics.oop.model.world_elements.Vector2d;
+
+import java.util.List;
 
 /**
  * The map visualizer converts the {@link IWorldMap} map into a string
@@ -74,12 +77,10 @@ public class MapVisualizer {
     }
 
     private String drawObject(Vector2d currentPosition) {
-        if (this.map.isOccupied(currentPosition)) {
-            Object object = this.map.objectAt(currentPosition);
-            if (object != null) {
-                return object.toString();
-            }
-        }
-        return EMPTY_CELL;
+        return this.map
+            .objectsAt(currentPosition)
+                .map(object -> object.get(0))
+                .map(IWorldElement::toString)
+                .orElse(EMPTY_CELL);
     }
 }

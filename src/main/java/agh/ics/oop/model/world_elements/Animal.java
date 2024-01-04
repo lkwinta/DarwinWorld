@@ -1,10 +1,15 @@
 package agh.ics.oop.model.world_elements;
 
+import agh.ics.oop.model.ModelConfiguration;
 import agh.ics.oop.model.world_map.IMoveTranslator;
 import agh.ics.oop.model.world_map.IMoveValidator;
 import agh.ics.oop.model.world_map.MapDirection;
 
-//TODO: Question: are new animals spawned at the beginign?
+import java.util.concurrent.ThreadLocalRandom;
+
+import static java.lang.Math.max;
+
+//TODO: Question: are new animals spawned with random genome and random orientation ?
 
 public class Animal implements IWorldElement, Comparable<Animal> {
     private Vector2d position;
@@ -12,33 +17,45 @@ public class Animal implements IWorldElement, Comparable<Animal> {
     private int energyLevel;
     private final Genome genome;
 
-    public Animal(int initialEnergyLevel){
-        this.energyLevel = initialEnergyLevel;
-        this.genome = Genome.RandomGenome();
+    public Animal(int initialEnergyLevel, Vector2d initialPosition, IGenomeBehaviour genomeBehaviour){
+        this.genome = Genome.RandomGenome(ModelConfiguration.GENES_LENGTH, genomeBehaviour);
+        System.out.println(genome);
+        initializeAnimal(initialEnergyLevel, initialPosition);
     }
 
-    private Animal(int initialEnergyLevel, Genome initialGenome) {
-        this.energyLevel = initialEnergyLevel;
+    private Animal(int initialEnergyLevel, Genome initialGenome, Vector2d initialPosition) {
         this.genome = initialGenome;
+        initializeAnimal(initialEnergyLevel, initialPosition);
+        System.out.println(genome);
+    }
+
+    private void initializeAnimal(int initialEnergyLevel, Vector2d initialPosition){
+        this.energyLevel = initialEnergyLevel;
+        this.position = initialPosition;
+        this.orientation = MapDirection.values()[ThreadLocalRandom.current().nextInt(0, 8)];
     }
 
     @Override
     public Vector2d getPosition() {
-        return null;
+        return position;
     }
 
     @Override
     public boolean isAt(Vector2d position) {
-        return false;
+        return position.equals(this.position);
     }
 
     public void move(IMoveTranslator moveTranslator, IMoveValidator moveValidator){
-        orientation = orientation.shift(genome.getActiveGene());
+        orientation = orientation.shift(genome.getActiveGene().ordinal());
         Vector2d newPosition = moveTranslator.getTranslatedPosition(position.add(orientation.toUnitVector()));
 
         if(moveValidator.canMoveTo(newPosition)){
             position = newPosition;
+        } else {
+            orientation = orientation.shift(Gene.ROTATION_180.ordinal());
         }
+
+        changeEnergy(-ModelConfiguration.ANIMAL_ENERGY_LOSS_PER_MOVE);
     }
 
     public void changeEnergy(int energyDelta){
@@ -59,7 +76,47 @@ public class Animal implements IWorldElement, Comparable<Animal> {
     }
 
     public Animal bread(Animal other){
-        //TODO : implement breading mechanism
-        return new Animal(0);
+        int side = ThreadLocalRandom.current().nextInt(0, 2);
+
+        float genesRatio = max(this.energyLevel, other.energyLevel)/(float)(this.energyLevel + other.energyLevel);
+
+        Genome newGenome = getChildGenome(other, side, genesRatio);
+
+        this.changeEnergy(-ModelConfiguration.ANIMAL_ENERGY_LOSS_PER_CHILD);
+        other.changeEnergy(-ModelConfiguration.ANIMAL_ENERGY_LOSS_PER_CHILD);
+
+        return new Animal(2*ModelConfiguration.ANIMAL_ENERGY_LOSS_PER_CHILD, newGenome, other.getPosition());
+    }
+
+    private Genome getChildGenome(Animal other, int side, float genesRatio) {
+        Genome strongerGenome = this.energyLevel > other.energyLevel ? this.genome : other.genome;
+        Genome weakerGenome = this.energyLevel > other.energyLevel ? other.genome : this.genome;
+
+        Genome newGenome = switch (side) {
+            case 0 -> strongerGenome.combineGenomes(weakerGenome, genesRatio);
+            case 1 -> weakerGenome.combineGenomes(strongerGenome, 1 - genesRatio);
+            default -> throw new IllegalStateException("Unexpected value: " + side);
+        };
+
+        newGenome.mutate();
+        return newGenome;
+    }
+
+    public int getEnergyLevel() {
+        return energyLevel;
+    }
+
+    @Override
+    public String toString(){
+        return switch (orientation) {
+            case NORTH -> "^";
+            case SOUTH -> "v";
+            case WEST -> "<";
+            case EAST -> ">";
+            case NORTH_WEST -> "7";
+            case NORTH_EAST -> "F";
+            case SOUTH_WEST -> "J";
+            case SOUTH_EAST -> "L";
+        };
     }
 }
