@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import javafx.collections.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane minHeight="61.0" minWidth="256.0" prefHeight="357.0" prefWidth="614.0" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="agh.ics.oop.presenter.SimulationConfigurationPresenter">
+    <top>
+        <BorderPane>
+            <top>
+                <HBox alignment="CENTER">
+                    <VBox>
+                        <Label fx:id="informationLabel" text="Please enter move directions" />
+                        <TextField fx:id="argsInput" prefHeight="25.0" prefWidth="570.0" />
+                    </VBox>
+                    <Button alignment="CENTER" mnemonicParsing="false" onAction="#onSimulationStartClicked" text="Start" HBox.hgrow="ALWAYS" />
+                </HBox>
+
+            </top>
+            <center>
+                <VBox BorderPane.alignment="CENTER">
+                    <ComboBox fx:id="mapSelector" onAction="#onItemSelected" value="GrassField">
+                        <items>
+                            <FXCollections fx:factory="observableArrayList">
+                                <String fx:value="GrassField" />
+                                <String fx:value="RectangularMap" />
+                            </FXCollections>
+                        </items>
+                    </ComboBox>
+                    <Pane fx:id="propertiesPane">
+                        <fx:include source="rectangularMapProperties.fxml" />
+                    </Pane>
+                    <HBox>
+                        <Button mnemonicParsing="false" onAction="#onAddAnimalClicked" text="Add Animal" />
+                        <Button mnemonicParsing="false" onAction="#onRemoveAnimalClicked" text="Remove Animal" />
+                    </HBox>
+                </VBox>
+            </center>
+        </BorderPane>
+    </top>
+   <center>
+       <ListView fx:id="animalsList" />
+   </center>
+</BorderPane>

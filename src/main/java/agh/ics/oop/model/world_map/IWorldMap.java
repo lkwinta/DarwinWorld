@@ -23,7 +23,7 @@ public interface IWorldMap {
      *
      * @param object The animal to place on the map.
      */
-    void place(IWorldElement object) throws PositionAlreadyOccupiedException;
+    void place(IWorldElement object);
 
     /**
      * Remove an object from world map
@@ -75,4 +75,7 @@ public interface IWorldMap {
      * @return return ID of the map
      */
     UUID getId();
+
+    int getWidth();
+    int getHeight();
 }

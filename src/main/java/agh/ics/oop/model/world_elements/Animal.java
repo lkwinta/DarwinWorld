@@ -119,4 +119,14 @@ public class Animal implements IWorldElement, Comparable<Animal> {
             case SOUTH_EAST -> "L";
         };
     }
+
+    @Override
+    public String getResourceName() {
+        return switch (orientation) {
+            case NORTH -> "up.png";
+            case SOUTH -> "down.png";
+            case WEST, NORTH_WEST, SOUTH_WEST -> "left.png";
+            case EAST, NORTH_EAST, SOUTH_EAST -> "right.png";
+        };
+    }
 }

@@ -110,6 +110,14 @@ public abstract class AbstractWorldMap implements IWorldMap, IMoveValidator, IMo
         return objectsAt(position).isPresent();
     }
 
+    public int getWidth() {
+        return this.width;
+    }
+
+    public int getHeight() {
+        return this.height;
+    }
+
     @Override
     public Optional<List<IWorldElement>> objectsAt(Vector2d position) {
         if (animalsMap.containsKey(position))

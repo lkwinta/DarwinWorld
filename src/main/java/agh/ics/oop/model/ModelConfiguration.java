@@ -9,4 +9,6 @@ public class ModelConfiguration {
     public static final int ANIMAL_ENERGY_LOSS_PER_MOVE = 1;
     public static final int ANIMAL_ENERGY_GAIN_PER_PLANT = 10;
     public static final int ANIMAL_ENERGY_LOSS_PER_CHILD = 20;
+    public static final int GRASS_GROWTH_PER_EVOLUTION = 10;
+    public static final int GRASS_STARTING_COUNT = 200;
 }
