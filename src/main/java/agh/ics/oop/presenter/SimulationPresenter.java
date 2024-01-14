@@ -14,6 +14,9 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.RowConstraints;
 import javafx.scene.layout.VBox;
 
+import java.util.Iterator;
+import java.util.List;
+
 public class SimulationPresenter {
 
     private final static int CELL_WIDTH = 40;

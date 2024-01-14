@@ -13,13 +13,9 @@ public enum Gene {
     ROTATION_315;
     private static final Random random = new Random();
     public Gene getNewRandom(){
-        int above_or_below = random.nextInt(2);
-        int index;
-        if(above_or_below == 0){
-            index = random.nextInt(0, this.ordinal());
-        } else {
-            index = random.nextInt((this.ordinal() + 1) % values().length,  values().length);
-        }
+        int index = random.nextInt(0, values().length);
+        while(index == this.ordinal())
+            index = random.nextInt(0, values().length);
 
         return values()[index];
     }

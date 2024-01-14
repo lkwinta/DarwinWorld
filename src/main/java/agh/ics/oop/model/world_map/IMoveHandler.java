@@ -2,7 +2,7 @@ package agh.ics.oop.model.world_map;
 
 import agh.ics.oop.model.world_elements.Vector2d;
 
-public interface IMoveValidator {
+public interface IMoveHandler {
 
     /**
      * Indicate if any object can move to the given position.
@@ -12,4 +12,6 @@ public interface IMoveValidator {
      * @return True if the object can move to that position.
      */
     boolean canMoveTo(Vector2d position);
+
+    Vector2d getTranslatedPosition(Vector2d position);
 }

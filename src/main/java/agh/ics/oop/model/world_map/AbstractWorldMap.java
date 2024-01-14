@@ -1,19 +1,21 @@
 package agh.ics.oop.model.world_map;
 
-import agh.ics.oop.model.*;
 import agh.ics.oop.model.util.MapVisualizer;
 import agh.ics.oop.model.world_elements.Animal;
 import agh.ics.oop.model.world_elements.Grass;
 import agh.ics.oop.model.world_elements.IWorldElement;
 import agh.ics.oop.model.world_elements.Vector2d;
+import com.google.common.collect.Streams;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import java.util.stream.Stream;
 
-public abstract class AbstractWorldMap implements IWorldMap, IMoveValidator, IMoveTranslator {
+public abstract class AbstractWorldMap implements IWorldMap, IMoveHandler {
     protected final MapVisualizer mapVisualizer;
-    protected final Map<Vector2d, List<Animal>> animalsMap;
-    protected final HashMap<Vector2d, Grass> grassMap;
+    protected final ConcurrentMap<Vector2d, List<Animal>> animalsMap;
+    protected final ConcurrentMap<Vector2d, Grass> grassMap;
     private final List<IMapChangeListener> listeners;
     private final UUID mapId;
     private final Boundary mapBoundary;
@@ -21,8 +23,8 @@ public abstract class AbstractWorldMap implements IWorldMap, IMoveValidator, IMo
     protected final int height;
 
     protected AbstractWorldMap(int width, int height){
-        animalsMap = new HashMap<>();
-        grassMap = new HashMap<>();
+        animalsMap = new ConcurrentHashMap<>();
+        grassMap = new ConcurrentHashMap<>();
 
         mapVisualizer = new MapVisualizer(this);
         listeners = new ArrayList<>();
@@ -90,7 +92,7 @@ public abstract class AbstractWorldMap implements IWorldMap, IMoveValidator, IMo
 
         Vector2d oldPosition = animal.getPosition();
 
-        animal.move(this, this);
+        animal.move( this);
 
         if(!animal.getPosition().equals(oldPosition)){
             removeFromHashMap(animalsMap, oldPosition, animal);
@@ -118,19 +120,37 @@ public abstract class AbstractWorldMap implements IWorldMap, IMoveValidator, IMo
         return this.height;
     }
 
+    public Optional<List<Animal>> getTopAnimalsAt(Vector2d position) {
+        if(!animalsMap.containsKey(position))
+            return Optional.empty();
+
+        return Optional.of(animalsMap.get(position));
+    }
+
+    public Optional<Grass> getGrassAt(Vector2d position) {
+        if(!grassMap.containsKey(position))
+            return Optional.empty();
+
+        return Optional.of(grassMap.get(position));
+    }
+
     @Override
     public Optional<List<IWorldElement>> objectsAt(Vector2d position) {
-        if (animalsMap.containsKey(position))
-            return Optional.of(animalsMap.get(position).stream().map(animal -> (IWorldElement)animal).toList());
-        if (grassMap.containsKey(position))
-            return Optional.of(List.of(grassMap.get(position)));
-        return Optional.empty();
+        if(animalsMap.containsKey(position) || grassMap.containsKey(position))
+            return Optional.of(
+                    Stream.concat(
+                            grassMap.containsKey(position) ? Stream.of(grassMap.get(position)) : Stream.empty(),
+                            animalsMap.containsKey(position) ? animalsMap.get(position).stream() : Stream.empty()
+                    ).toList()
+            );
+        else
+            return Optional.empty();
     }
 
     @Override
     public List<IWorldElement> getElements() {
         return new ArrayList<>(
-                Stream.concat(
+                Streams.concat(
                         grassMap.values().stream().map(grass -> (IWorldElement)grass),
                         animalsMap.values().stream().flatMap(Collection::stream).toList().stream().map(animal -> (IWorldElement)animal)
                 ).toList());

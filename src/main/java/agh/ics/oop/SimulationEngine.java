@@ -63,4 +63,8 @@ public class SimulationEngine {
         thread.start();
         simulationThreadsList.add(thread);
     }
+
+    public void interruptAllSimulations() {
+        simulationThreadsList.forEach(Thread::interrupt);
+    }
 }

@@ -1,8 +1,7 @@
 package agh.ics.oop.model.world_elements;
 
 import agh.ics.oop.model.ModelConfiguration;
-import agh.ics.oop.model.world_map.IMoveTranslator;
-import agh.ics.oop.model.world_map.IMoveValidator;
+import agh.ics.oop.model.world_map.IMoveHandler;
 import agh.ics.oop.model.world_map.MapDirection;
 
 import java.util.concurrent.ThreadLocalRandom;
@@ -18,7 +17,7 @@ public class Animal implements IWorldElement, Comparable<Animal> {
     private final Genome genome;
 
     public Animal(int initialEnergyLevel, Vector2d initialPosition, IGenomeBehaviour genomeBehaviour){
-        this.genome = Genome.RandomGenome(ModelConfiguration.GENES_LENGTH, genomeBehaviour);
+        this.genome = Genome.RandomGenome(ModelConfiguration.ANIMAL_GENES_LENGTH, genomeBehaviour);
         System.out.println(genome);
         initializeAnimal(initialEnergyLevel, initialPosition);
     }
@@ -32,7 +31,7 @@ public class Animal implements IWorldElement, Comparable<Animal> {
     private void initializeAnimal(int initialEnergyLevel, Vector2d initialPosition){
         this.energyLevel = initialEnergyLevel;
         this.position = initialPosition;
-        this.orientation = MapDirection.values()[ThreadLocalRandom.current().nextInt(0, 8)];
+        this.orientation = MapDirection.values()[ThreadLocalRandom.current().nextInt(0, MapDirection.values().length)];
     }
 
     @Override
@@ -45,11 +44,11 @@ public class Animal implements IWorldElement, Comparable<Animal> {
         return position.equals(this.position);
     }
 
-    public void move(IMoveTranslator moveTranslator, IMoveValidator moveValidator){
+    public void move(IMoveHandler moveHandler){
         orientation = orientation.shift(genome.getActiveGene().ordinal());
-        Vector2d newPosition = moveTranslator.getTranslatedPosition(position.add(orientation.toUnitVector()));
+        Vector2d newPosition = moveHandler.getTranslatedPosition(position.add(orientation.toUnitVector()));
 
-        if(moveValidator.canMoveTo(newPosition)){
+        if(moveHandler.canMoveTo(newPosition)){
             position = newPosition;
         } else {
             orientation = orientation.shift(Gene.ROTATION_180.ordinal());
@@ -75,7 +74,7 @@ public class Animal implements IWorldElement, Comparable<Animal> {
         return Integer.compare(energyLevel, o.energyLevel);
     }
 
-    public Animal bread(Animal other){
+    public Animal breed(Animal other){
         int side = ThreadLocalRandom.current().nextInt(0, 2);
 
         float genesRatio = max(this.energyLevel, other.energyLevel)/(float)(this.energyLevel + other.energyLevel);
@@ -102,8 +101,8 @@ public class Animal implements IWorldElement, Comparable<Animal> {
         return newGenome;
     }
 
-    public int getEnergyLevel() {
-        return energyLevel;
+    public boolean canBreed() {
+        return energyLevel > ModelConfiguration.ANIMAL_READY_TO_BREED_ENERGY;
     }
 
     @Override
@@ -123,10 +122,14 @@ public class Animal implements IWorldElement, Comparable<Animal> {
     @Override
     public String getResourceName() {
         return switch (orientation) {
-            case NORTH -> "up.png";
-            case SOUTH -> "down.png";
-            case WEST, NORTH_WEST, SOUTH_WEST -> "left.png";
-            case EAST, NORTH_EAST, SOUTH_EAST -> "right.png";
+            case NORTH -> "north.png";
+            case SOUTH -> "south.png";
+            case WEST -> "west.png";
+            case NORTH_WEST -> "north_west.png";
+            case NORTH_EAST -> "north_east.png";
+            case EAST -> "east.png";
+            case SOUTH_WEST -> "south_west.png";
+            case SOUTH_EAST -> "south_east.png";
         };
     }
 }

@@ -1,4 +1,8 @@
-package agh.ics.oop.model.world_elements;
+package agh.ics.oop.model.world_map;
+
+import agh.ics.oop.model.world_elements.Grass;
+import agh.ics.oop.model.world_elements.Vector2d;
+import com.google.common.collect.Streams;
 
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
@@ -12,7 +16,6 @@ public class EquatorGrassGenerator implements Iterator<Grass>, Iterable<Grass> {
     private final Set<Vector2d> freeOtherPositions;
 
     public EquatorGrassGenerator(int width, int height){
-        //TODO: unique generation?
         this.equatorYCoordinate = height / 2;
         this.equatorHeight = (int)Math.ceil(0.1*height);
 
@@ -71,6 +74,9 @@ public class EquatorGrassGenerator implements Iterator<Grass>, Iterable<Grass> {
 
     @Override
     public Grass next() {
+        if(!hasNext())
+            throw new NoSuchElementException("Random position generator has no more elements.");
+
         boolean isPreferable = ThreadLocalRandom.current().nextFloat() < 0.8;
 
         if((isPreferable || freeOtherPositions.isEmpty()) && !freeEquatorPositions.isEmpty()){
@@ -81,6 +87,6 @@ public class EquatorGrassGenerator implements Iterator<Grass>, Iterable<Grass> {
     }
 
     public Stream<Grass> stream() {
-        return StreamSupport.stream(spliterator(), false);
+        return Streams.stream(iterator());
     }
 }

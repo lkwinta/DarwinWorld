@@ -65,9 +65,9 @@ public class SimulationConfigurationPresenter {
             informationLabel.setText("Please enter move directions");
             informationLabel.setTextFill(Color.BLACK);
 
-            Simulation simulation = new Simulation(getAnimalPositions(), map, new FullPredestinationBehaviour(), 1000);
+            Simulation simulation = new Simulation(map, new FullPredestinationBehaviour(), 100);
 
-            simulationEngine.runSingleAsyncInThreadPool(simulation);
+            simulationEngine.runSingleAsync(simulation);
 
             stagesList.add(stage);
             stage.show();
@@ -114,6 +114,7 @@ public class SimulationConfigurationPresenter {
     }
 
     public void onApplicationClose() throws InterruptedException {
+        simulationEngine.interruptAllSimulations();
         simulationEngine.awaitAllSimulationsEnd();
 
         stagesList.forEach(Stage::close);
