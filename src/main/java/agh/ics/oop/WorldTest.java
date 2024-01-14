@@ -23,7 +23,7 @@ public class WorldTest {
 
         //map.addListener(mapDisplay);
 
-        //Simulation simulation = new Simulation(map, new FullPredestinationBehaviour(), 1000);
+        Simulation simulation = new Simulation(map, new FullPredestinationBehaviour(), 1000);
 
         //simulation.run();
     }

@@ -15,12 +15,12 @@ import static java.lang.Thread.interrupted;
 public class Simulation implements Runnable {
     private final Set<Animal> animalsSet;
     private final AbstractWorldMap worldMap;
-    private final int timeout;
+    private final int tickDelay;
     private final EquatorGrassGenerator grassGenerator;
 
-    public Simulation(AbstractWorldMap worldMap, IGenomeBehaviour genomeBehaviour, int timeout){
+    public Simulation(AbstractWorldMap worldMap, IGenomeBehaviour genomeBehaviour, int tickDelay){
         this.worldMap = worldMap;
-        this.timeout = timeout;
+        this.tickDelay = tickDelay;
 
 
         Boundary mapBounds = worldMap.getCurrentBounds();
@@ -54,7 +54,7 @@ public class Simulation implements Runnable {
                 processAnimalsReproduction();
                 processGrowNewGrass();
 
-                Thread.sleep(timeout);
+                Thread.sleep(tickDelay);
             }
         } catch(InterruptedException ex){
             System.out.println("Simulation stopped because simulation thread got interrupted!");
