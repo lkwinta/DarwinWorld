@@ -27,25 +27,17 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 public class SimulationConfigurationPresenter {
     private final SimulationEngine simulationEngine = new SimulationEngine();
     private final List<Stage> stagesList = new ArrayList<>();
     private Object propertiesController;
-    private final List<AnimalPropertyEntryPresenter> animalsControllers = new ArrayList<>();
-    
-    @FXML
-    private TextField argsInput;
-    @FXML
-    private Label informationLabel;
+
     @FXML
     private ComboBox<String> mapSelector;
     @FXML
     private Pane propertiesPane;
-    @FXML
-    private ListView<HBox> animalsList;
 
     @FXML
     private void onSimulationStartClicked() {
@@ -59,9 +51,6 @@ public class SimulationConfigurationPresenter {
 
             AbstractWorldMap map = getAbstractWorldMap(fxmlLoader, stage);
 
-            informationLabel.setText("Please enter move directions");
-            informationLabel.setTextFill(Color.BLACK);
-
             Simulation simulation = new Simulation(map, new FullPredestinationBehaviour(), 100);
 
             int id = simulationEngine.runSingleAsync(simulation);
@@ -70,10 +59,6 @@ public class SimulationConfigurationPresenter {
 
             stagesList.add(stage);
             stage.show();
-        } catch (IllegalArgumentException ex) {
-            System.out.println("Passed illegal argument, please enter correct data: " + ex.getMessage());
-            informationLabel.setText("Passed illegal argument, please enter correct data: " + ex.getMessage());
-            informationLabel.setTextFill(Color.RED);
         }
         catch (IOException ex) {
             /* Crash the application, can't continue without necessary view */
@@ -86,12 +71,12 @@ public class SimulationConfigurationPresenter {
         SimulationPresenter presenter = fxmlLoader.getController();
 
         AbstractWorldMap map;
-        if (mapSelector.getValue().equals("GrassField")) {
-            GrassFieldPropertiesPresenter properties = (GrassFieldPropertiesPresenter) propertiesController;
+        if (mapSelector.getValue().equals("OceanMap")) {
+            OceanMapPropertiesPresenter properties = (OceanMapPropertiesPresenter) propertiesController;
             map = new OceanMap(properties.getWidth(), properties.getHeight());
         }
         else {
-            RectangularMapPropertiesPresenter properties = (RectangularMapPropertiesPresenter) propertiesController;
+            EarthMapMapPropertiesPresenter properties = (EarthMapMapPropertiesPresenter) propertiesController;
             map = new EarthMap(properties.getWidth(), properties.getHeight());
         }
 
@@ -100,16 +85,11 @@ public class SimulationConfigurationPresenter {
 
         map.addListener((worldMap, message) -> Platform.runLater(presenter::drawMap));
         map.addListener((worldMap, message) -> Platform.runLater(() -> presenter.setMoveInformationLabel(message)));
-        map.addListener(((worldMap, message) ->
-                System.out.printf("%s %s\n", LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss")), message)));
-        map.addListener((worldMap, message) -> Platform.runLater(stage::sizeToScene));
+        //map.addListener(((worldMap, message) ->
+        //        System.out.printf("%s %s\n", LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss")), message)));
        // map.addListener(mapDisplay);
 
         return map;
-    }
-
-    private List<Vector2d> getAnimalPositions(){
-        return animalsControllers.stream().map((controller) -> new Vector2d(controller.getXPosition(), controller.getYPosition())).toList();
     }
 
     public void onConfigurationApplicationClose() throws InterruptedException {
@@ -123,10 +103,10 @@ public class SimulationConfigurationPresenter {
         FXMLLoader loader = new FXMLLoader();
 
         try {
-            if (mapSelector.getValue().equals("GrassField"))
-                loader.setLocation(getClass().getClassLoader().getResource("views/grassFieldProperties.fxml"));
+            if (mapSelector.getValue().equals("OceanMap"))
+                loader.setLocation(getClass().getClassLoader().getResource("views/oceanMapProperties.fxml"));
             else
-                loader.setLocation(getClass().getClassLoader().getResource("views/rectangularMapProperties.fxml"));
+                loader.setLocation(getClass().getClassLoader().getResource("views/earthMapProperties.fxml"));
 
             VBox rootView = loader.load();
 
@@ -142,34 +122,8 @@ public class SimulationConfigurationPresenter {
     }
 
     @FXML
-    private void onItemSelected() {
+    private void onMapSelected() {
         loadPropertiesPane();
-    }
-
-    @FXML
-    private void onAddAnimalClicked() {
-        FXMLLoader loader = new FXMLLoader();
-        loader.setLocation(getClass().getClassLoader().getResource("views/animalPropertyEntry.fxml"));
-
-        try {
-            HBox root = loader.load();
-            animalsList.getItems().add(root);
-            animalsControllers.add(loader.getController());
-        } catch (IOException ex){
-            /* Crash the application, can't continue without necessary view */
-            System.out.println("Can't load fxmlFile" + ex.getMessage());
-            Platform.exit();
-        }
-    }
-
-    @FXML
-    private void onRemoveAnimalClicked() {
-        int lastIndex = animalsList.getItems().size() - 1;
-
-        if (lastIndex >= 0){
-            animalsList.getItems().remove(lastIndex);
-            animalsControllers.remove(lastIndex);
-        }
     }
 
     /*

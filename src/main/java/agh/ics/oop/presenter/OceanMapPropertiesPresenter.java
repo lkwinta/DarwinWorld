@@ -3,7 +3,7 @@ package agh.ics.oop.presenter;
 import javafx.fxml.FXML;
 import javafx.scene.control.TextField;
 
-public class GrassFieldPropertiesPresenter {
+public class OceanMapPropertiesPresenter {
     @FXML
     private TextField grassCountTextField;
 

@@ -3,7 +3,7 @@ package agh.ics.oop.presenter;
 import javafx.fxml.FXML;
 import javafx.scene.control.TextField;
 
-public class RectangularMapPropertiesPresenter {
+public class EarthMapMapPropertiesPresenter {
     @FXML
     private TextField widthTextField;
     @FXML

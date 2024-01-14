@@ -10,36 +10,27 @@
         <BorderPane>
             <top>
                 <HBox alignment="CENTER">
-                    <VBox>
-                        <Label fx:id="informationLabel" text="Please enter move directions" />
-                        <TextField fx:id="argsInput" prefHeight="25.0" prefWidth="570.0" />
-                    </VBox>
+                    <VBox />
                     <Button alignment="CENTER" mnemonicParsing="false" onAction="#onSimulationStartClicked" text="Start" HBox.hgrow="ALWAYS" />
                 </HBox>
 
             </top>
             <center>
                 <VBox BorderPane.alignment="CENTER">
-                    <ComboBox fx:id="mapSelector" onAction="#onItemSelected" value="GrassField">
+                    <ComboBox fx:id="mapSelector" onAction="#onMapSelected" value="EarthMap">
                         <items>
                             <FXCollections fx:factory="observableArrayList">
-                                <String fx:value="GrassField" />
-                                <String fx:value="RectangularMap" />
+                                <String fx:value="OceanMap" />
+                                <String fx:value="EarthMap" />
                             </FXCollections>
                         </items>
                     </ComboBox>
                     <Pane fx:id="propertiesPane">
-                        <fx:include source="rectangularMapProperties.fxml" />
+                        <fx:include source="earthMapProperties.fxml" />
                     </Pane>
-                    <HBox>
-                        <Button mnemonicParsing="false" onAction="#onAddAnimalClicked" text="Add Animal" />
-                        <Button mnemonicParsing="false" onAction="#onRemoveAnimalClicked" text="Remove Animal" />
-                    </HBox>
+                    <HBox />
                 </VBox>
             </center>
         </BorderPane>
     </top>
-   <center>
-       <ListView fx:id="animalsList" />
-   </center>
 </BorderPane>
