@@ -1,11 +1,8 @@
 package agh.ics.oop.model.world_map;
 
-import agh.ics.oop.model.MoveDirection;
-import agh.ics.oop.model.PositionAlreadyOccupiedException;
 import agh.ics.oop.model.world_elements.Vector2d;
 import agh.ics.oop.model.world_elements.IWorldElement;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;

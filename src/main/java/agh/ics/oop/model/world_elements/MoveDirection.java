@@ -1,4 +1,4 @@
-package agh.ics.oop.model;
+package agh.ics.oop.model.world_elements;
 
 /**
  * Enum representing possible directions of motion for the animal

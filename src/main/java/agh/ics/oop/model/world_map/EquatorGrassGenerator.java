@@ -27,9 +27,6 @@ public class EquatorGrassGenerator implements Iterator<Grass>, Iterable<Grass> {
                  addFreePosition(new Vector2d(x, y));
             }
         }
-
-        System.out.println(freeOtherPositions.size());
-        System.out.println(freeEquatorPositions.size());
     }
 
     public void addFreePosition(Vector2d position) {
