@@ -1,7 +1,6 @@
 package agh.ics.oop.presenter;
 
 import agh.ics.oop.SimulationEngine;
-import agh.ics.oop.model.MoveDirection;
 import agh.ics.oop.model.Simulation;
 //import agh.ics.oop.model.util.FileMapDisplay;
 import agh.ics.oop.model.world_elements.FullPredestinationBehaviour;
@@ -28,6 +27,7 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 public class SimulationConfigurationPresenter {
@@ -47,9 +47,6 @@ public class SimulationConfigurationPresenter {
     @FXML
     private ListView<HBox> animalsList;
 
-    private String[] getArgsInput() {
-        return argsInput.getText().split(" ");
-    }
     @FXML
     private void onSimulationStartClicked() {
         try {
@@ -67,7 +64,9 @@ public class SimulationConfigurationPresenter {
 
             Simulation simulation = new Simulation(map, new FullPredestinationBehaviour(), 100);
 
-            simulationEngine.runSingleAsync(simulation);
+            int id = simulationEngine.runSingleAsync(simulation);
+
+            stage.setOnCloseRequest(event -> simulationEngine.interruptSingleSimulation(id));
 
             stagesList.add(stage);
             stage.show();
@@ -113,7 +112,7 @@ public class SimulationConfigurationPresenter {
         return animalsControllers.stream().map((controller) -> new Vector2d(controller.getXPosition(), controller.getYPosition())).toList();
     }
 
-    public void onApplicationClose() throws InterruptedException {
+    public void onConfigurationApplicationClose() throws InterruptedException {
         simulationEngine.interruptAllSimulations();
         simulationEngine.awaitAllSimulationsEnd();
 

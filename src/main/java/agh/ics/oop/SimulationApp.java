@@ -29,7 +29,7 @@ public class SimulationApp extends Application {
                 we can't throw InterruptedException any further because of lambda, we have to handle it
                  */
                 try {
-                    presenter.onApplicationClose();
+                    presenter.onConfigurationApplicationClose();
                 }
                 catch(InterruptedException ex) {
                     System.out.println("Interrupted exception while closing application");
