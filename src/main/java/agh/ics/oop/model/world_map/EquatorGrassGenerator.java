@@ -3,11 +3,11 @@ package agh.ics.oop.model.world_map;
 import agh.ics.oop.model.world_elements.Grass;
 import agh.ics.oop.model.world_elements.Vector2d;
 import com.google.common.collect.Streams;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
 
 public class EquatorGrassGenerator implements Iterator<Grass>, Iterable<Grass> {
     private final int equatorYCoordinate;
@@ -37,10 +37,11 @@ public class EquatorGrassGenerator implements Iterator<Grass>, Iterable<Grass> {
     }
 
     private boolean isPositionInEquator(Vector2d position){
-        return position.getY() >= equatorYCoordinate - equatorHeight && position.getY() < equatorYCoordinate + equatorHeight;
+        return position.y() >= equatorYCoordinate - equatorHeight && position.y() < equatorYCoordinate + equatorHeight;
     }
 
     @Override
+    @NotNull
     public Iterator<Grass> iterator() {
         return this;
     }

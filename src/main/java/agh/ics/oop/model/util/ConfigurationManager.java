@@ -11,10 +11,7 @@ import agh.ics.oop.model.ModelConfiguration;
 import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import javafx.beans.property.ListProperty;
-import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleListProperty;
-import javafx.beans.property.SimpleObjectProperty;
+
 
 public class ConfigurationManager {
     private static final Gson gson = new GsonBuilder().setPrettyPrinting().create();

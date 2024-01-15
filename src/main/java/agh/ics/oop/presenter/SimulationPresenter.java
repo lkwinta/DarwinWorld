@@ -35,8 +35,8 @@ public class SimulationPresenter {
         clearGrid();
 
         Boundary currentBounds = worldMap.getCurrentBounds();
-        int width = currentBounds.topRight().getX() - currentBounds.bottomLeft().getX() + 1;
-        int height = currentBounds.topRight().getY() - currentBounds.bottomLeft().getY() + 1;
+        int width = currentBounds.topRight().x() - currentBounds.bottomLeft().x() + 1;
+        int height = currentBounds.topRight().y() - currentBounds.bottomLeft().y() + 1;
 
         addConstraints(width, height);
         createAxes(width, height, currentBounds);
@@ -45,8 +45,8 @@ public class SimulationPresenter {
             VBox elementBox = WorldElementBoxFactory.getWorldElementBox(element);
             GridPane.setHalignment(elementBox, HPos.CENTER);
             mapGridPane.add(elementBox,
-                    element.getPosition().getX() + 1 - currentBounds.bottomLeft().getX(),
-                    height - (element.getPosition().getY() - currentBounds.bottomLeft().getY()));
+                    element.position().x() + 1 - currentBounds.bottomLeft().x(),
+                    height - (element.position().y() - currentBounds.bottomLeft().y()));
         }
 
        // mapGridPane.getScene().getWindow().sizeToScene(); //TODO: fix this, suboptiaml solution
@@ -67,8 +67,8 @@ public class SimulationPresenter {
         GridPane.setHalignment(yx, HPos.CENTER);
         mapGridPane.add(yx, 0, 0);
 
-        createAxis(width, currentBounds.bottomLeft().getX(), 1, xAxisMask);
-        createAxis(height, currentBounds.topRight().getY(), -1, yAxisMask);
+        createAxis(width, currentBounds.bottomLeft().x(), 1, xAxisMask);
+        createAxis(height, currentBounds.topRight().y(), -1, yAxisMask);
     }
 
     private void createAxis(int size, int start_value, int step, Vector2d axis_mask) {
@@ -76,7 +76,7 @@ public class SimulationPresenter {
         for (int i = 1; i <= size; i++){
             Label axis_value = new Label(String.valueOf(value));
             GridPane.setHalignment(axis_value, HPos.CENTER);
-            mapGridPane.add(axis_value, i * axis_mask.getX(), i * axis_mask.getY());
+            mapGridPane.add(axis_value, i * axis_mask.x(), i * axis_mask.y());
             value += step;
         }
     }

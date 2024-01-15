@@ -5,11 +5,14 @@ import static java.lang.Math.min;
 
 /**
  * Class representing 2D point/Vector in integer cooridnate system
+ *
+ * @param x -- GETTER --
+ *          Getter for X coordinate
+ * @param y -- GETTER --
+ *          Getter for X coordinate
  */
-public class Vector2d {
-    private final int x;
-    private final int y;
-
+@SuppressWarnings("unused")
+public record Vector2d(int x, int y) {
     /**
      * Constructor taking pair of integers and storing them as final
      * vector/point coordinates
@@ -17,16 +20,13 @@ public class Vector2d {
      * @param x X coordinate of vector
      * @param y Y coordinate of vector
      */
-    public Vector2d(int x, int y){
-        this.x = x;
-        this.y = y;
+    public Vector2d {
     }
 
     /**
      * Checks if vector is precessing other vector,
      *
      * @param other Vector2d for comparison
-     *
      * @return true if both coordinates are less or equal other's coordinates, otherwise false
      */
     public boolean precedes(Vector2d other) {
@@ -37,7 +37,6 @@ public class Vector2d {
      * Checks if vector is following other vector,
      *
      * @param other Vector2d for comparison
-     *
      * @return true if both coordinates are greater or equal other's coordinates, otherwise false
      */
     public boolean follows(Vector2d other) {
@@ -48,7 +47,6 @@ public class Vector2d {
      * Adds coordinates of other vector to the vector
      *
      * @param other Vector whose coordinates will be added
-     *
      * @return new Vector2d with added coordinates
      */
     public Vector2d add(Vector2d other) {
@@ -59,7 +57,6 @@ public class Vector2d {
      * Subtracts coordinates of other vector to the vector
      *
      * @param other Vector whose coordinates will be added
-     *
      * @return new Vector2d with added coordinates
      */
     public Vector2d subtract(Vector2d other) {
@@ -83,24 +80,6 @@ public class Vector2d {
         return new Vector2d(min(other.x, this.x), min(other.y, this.y));
     }
 
-    /**
-     * Getter for X coordinate
-     *
-     * @return value of X private field
-     */
-    public int getX(){
-        return this.x;
-    }
-
-    /**
-     * Getter for X coordinate
-     *
-     * @return value of Y private field
-     */
-    public int getY(){
-        return this.y;
-    }
-
     @Override
     public String toString() {
         return "(%d, %d)".formatted(this.x, this.y);
@@ -113,13 +92,4 @@ public class Vector2d {
         return false;
     }
 
-    @Override
-    public int hashCode(){
-        int hash = 17;
-
-        hash *= 23 * this.x;
-        hash *= 23 * this.y;
-
-        return hash;
-    }
 }

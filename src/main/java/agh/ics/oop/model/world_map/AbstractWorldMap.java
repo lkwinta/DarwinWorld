@@ -12,6 +12,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.stream.Stream;
 
+@SuppressWarnings("unused")
 public abstract class AbstractWorldMap implements IMoveHandler {
     protected final MapVisualizer mapVisualizer;
     protected final ConcurrentMap<Vector2d, List<Animal>> animalsMap;
@@ -65,21 +66,21 @@ public abstract class AbstractWorldMap implements IMoveHandler {
 
     public void place(IWorldElement object) {
         if(object instanceof Animal animal) {
-            addToHashMap(animalsMap, animal.getPosition(), animal);
-            mapChanged("Animal placed at: " + animal.getPosition());
+            addToHashMap(animalsMap, animal.position(), animal);
+            mapChanged("Animal placed at: " + animal.position());
         } else if (object instanceof Grass grass) {
-            grassMap.put(grass.getPosition(), grass);
-            mapChanged("Grass placed at: " + grass.getPosition());
+            grassMap.put(grass.position(), grass);
+            mapChanged("Grass placed at: " + grass.position());
         }
     }
 
     public void remove(IWorldElement object) {
         if(object instanceof Animal animal) {
-            removeFromHashMap(animalsMap, animal.getPosition(), animal);
-            mapChanged("Animal removed from: " + animal.getPosition());
+            removeFromHashMap(animalsMap, animal.position(), animal);
+            mapChanged("Animal removed from: " + animal.position());
         } else if (object instanceof Grass grass) {
-            grassMap.remove(grass.getPosition());
-            mapChanged("Grass removed from: " + grass.getPosition());
+            grassMap.remove(grass.position());
+            mapChanged("Grass removed from: " + grass.position());
         }
     }
 
@@ -87,21 +88,21 @@ public abstract class AbstractWorldMap implements IMoveHandler {
         if(!(object instanceof Animal animal))
             throw new IllegalArgumentException("You can't move object that is not an Animal'");
 
-        Vector2d oldPosition = animal.getPosition();
+        Vector2d oldPosition = animal.position();
 
         animal.move( this);
 
-        if(!animal.getPosition().equals(oldPosition)){
+        if(!animal.position().equals(oldPosition)){
             removeFromHashMap(animalsMap, oldPosition, animal);
-            addToHashMap(animalsMap, animal.getPosition(), animal);
+            addToHashMap(animalsMap, animal.position(), animal);
             mapChanged("Animal at %s moved to: %s with orientation: %s".formatted(
                     oldPosition,
-                    animal.getPosition(),
+                    animal.position(),
                     animal.getOrientation()
             ));
         }
         else
-            mapChanged("Cannot move animal at: %s".formatted(animal.getPosition()));
+            mapChanged("Cannot move animal at: %s".formatted(animal.position()));
     }
 
     public boolean isOccupied(Vector2d position) {

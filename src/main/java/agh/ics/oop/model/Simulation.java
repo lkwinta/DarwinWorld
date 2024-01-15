@@ -29,11 +29,11 @@ public class Simulation implements Runnable {
                 this.configuration.getStartingAnimalsCount());
 
         animalsSet = new HashSet<>(this.configuration.getStartingAnimalsCount());
-        for(Vector2d position : positionGenerator) {
+        positionGenerator.forEach((position) -> {
             Animal animal = new Animal(this.configuration.getAnimalStartingEnergy(), position, this.configuration);
             worldMap.place(animal);
             animalsSet.add(animal);
-        }
+        });
 
         grassGenerator = new EquatorGrassGenerator(configuration.getMapWidth(), configuration.getMapHeight());
         grassGenerator.stream().limit(this.configuration.getStartingGrassCount()).forEach(worldMap::place);
@@ -73,7 +73,7 @@ public class Simulation implements Runnable {
     }
 
     private void processAnimalsEating() {
-        for (Vector2d position : animalsSet.stream().map(Animal::getPosition).collect(Collectors.toSet())) {
+        for (Vector2d position : animalsSet.stream().map(Animal::position).collect(Collectors.toSet())) {
             Animal topAnimal = worldMap.getTopAnimalsAt(position)
                     .orElseThrow().stream()
                     .sorted(Comparator.reverseOrder())
@@ -90,7 +90,7 @@ public class Simulation implements Runnable {
     }
 
     private void processAnimalsReproduction() {
-        for (Vector2d position : animalsSet.stream().map(Animal::getPosition).collect(Collectors.toSet())){
+        for (Vector2d position : animalsSet.stream().map(Animal::position).collect(Collectors.toSet())){
             List<Animal> canBreed = worldMap
                     .getTopAnimalsAt(position)
                     .orElseThrow().stream()

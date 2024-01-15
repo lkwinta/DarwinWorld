@@ -22,7 +22,7 @@ public class WorldElementBoxFactory {
         imageView.setFitHeight(20);
         imageView.setFitWidth(20);
 
-        Label label = new Label(worldElement.getPosition().toString());
+        Label label = new Label(worldElement.position().toString());
 
         VBox vBox = new VBox();
         vBox.getChildren().add(imageView);

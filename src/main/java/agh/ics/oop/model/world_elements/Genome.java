@@ -1,17 +1,17 @@
 package agh.ics.oop.model.world_elements;
 
+import lombok.ToString;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
-import java.util.stream.Collectors;
 
-//TODO: Question: is new Genom random?
+@ToString
 public class Genome {
     private final int length;
-    private int activeGene;
+    @ToString.Exclude private int activeGene;
     private final List<Gene> genes;
-
-    private final IGenomeBehaviour genomeBehaviour;
+    @ToString.Exclude private final IGenomeBehaviour genomeBehaviour;
 
     private Genome(int length, IGenomeBehaviour genomeBehaviour){
         this.length = length;
@@ -59,14 +59,5 @@ public class Genome {
 
         activeGene = genomeBehaviour.shiftGenome(activeGene, length);
         return gene;
-    }
-
-    @Override
-    public String toString() {
-        return "Genome{" +
-                "length=" + length +
-                ", activeGene=" + activeGene +
-                ", genes={" + genes.stream().map(Object::toString).collect(Collectors.joining(", ")) +
-                "}}";
     }
 }

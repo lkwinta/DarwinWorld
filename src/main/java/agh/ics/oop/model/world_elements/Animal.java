@@ -1,7 +1,6 @@
 package agh.ics.oop.model.world_elements;
 
 import agh.ics.oop.model.ModelConfiguration;
-import agh.ics.oop.model.util.ConfigurationManager;
 import agh.ics.oop.model.world_map.IMoveHandler;
 import agh.ics.oop.model.world_map.MapDirection;
 import lombok.Getter;
@@ -9,8 +8,6 @@ import lombok.Getter;
 import java.util.concurrent.ThreadLocalRandom;
 
 import static java.lang.Math.max;
-
-//TODO: Question: are new animals spawned with random genome and random orientation ?
 
 public class Animal implements IWorldElement, Comparable<Animal> {
     private Vector2d position;
@@ -42,7 +39,7 @@ public class Animal implements IWorldElement, Comparable<Animal> {
     }
 
     @Override
-    public Vector2d getPosition() {
+    public Vector2d position() {
         return position;
     }
 
@@ -87,7 +84,7 @@ public class Animal implements IWorldElement, Comparable<Animal> {
         this.changeEnergy(-this.configuration.getAnimalEnergyGivenToChild());
         other.changeEnergy(-this.configuration.getAnimalEnergyGivenToChild());
 
-        return new Animal(2*this.configuration.getAnimalEnergyGivenToChild(), newGenome, other.getPosition(), this.configuration);
+        return new Animal(2*this.configuration.getAnimalEnergyGivenToChild(), newGenome, other.position(), this.configuration);
     }
 
     private Genome getChildGenome(Animal other, int side, float genesRatio) {
