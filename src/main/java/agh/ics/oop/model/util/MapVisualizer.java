@@ -1,13 +1,11 @@
 package agh.ics.oop.model.util;
 
-import agh.ics.oop.model.world_map.IWorldMap;
 import agh.ics.oop.model.world_elements.IWorldElement;
 import agh.ics.oop.model.world_elements.Vector2d;
-
-import java.util.List;
+import agh.ics.oop.model.world_map.AbstractWorldMap;
 
 /**
- * The map visualizer converts the {@link IWorldMap} map into a string
+ * The map visualizer converts the {@link AbstractWorldMap} map into a string
  * representation.
  *
  * @author apohllo, idzik
@@ -16,14 +14,14 @@ public class MapVisualizer {
     private static final String EMPTY_CELL = " ";
     private static final String FRAME_SEGMENT = "-";
     private static final String CELL_SEGMENT = "|";
-    private final IWorldMap map;
+    private final AbstractWorldMap map;
 
     /**
      * Initializes the MapVisualizer with an instance of map to visualize.
      *
      * @param map IWorld map object that will be drowned on the screen
      */
-    public MapVisualizer(IWorldMap map) {
+    public MapVisualizer(AbstractWorldMap map) {
         this.map = map;
     }
 

@@ -21,8 +21,7 @@ public class SimulationApp extends Application {
 
             configureStage(primaryStage, viewRoot);
             SimulationConfigurationPresenter presenter = configurationLoader.getController();
-
-            presenter.loadPropertiesPane();
+            presenter.loadConfigurations();
 
             primaryStage.setOnCloseRequest(event -> {
                 /*
@@ -37,6 +36,7 @@ public class SimulationApp extends Application {
                 Platform.exit();
             });
 
+            primaryStage.setResizable(false);
             primaryStage.show();
 
         } catch (IOException ex) {

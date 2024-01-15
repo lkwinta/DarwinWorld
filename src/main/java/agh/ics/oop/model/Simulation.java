@@ -15,34 +15,32 @@ import static java.lang.Thread.interrupted;
 public class Simulation implements Runnable {
     private final Set<Animal> animalsSet;
     private final AbstractWorldMap worldMap;
-    private final int tickDelay;
     private final EquatorGrassGenerator grassGenerator;
+    private final ModelConfiguration configuration;
 
-    public Simulation(AbstractWorldMap worldMap, IGenomeBehaviour genomeBehaviour, int tickDelay){
+    public Simulation(AbstractWorldMap worldMap, ModelConfiguration configuration){
         this.worldMap = worldMap;
-        this.tickDelay = tickDelay;
-
+        this.configuration = configuration;
 
         Boundary mapBounds = worldMap.getCurrentBounds();
         RandomPositionGenerator positionGenerator = new RandomPositionGenerator(
                 mapBounds.bottomLeft(),
                 mapBounds.topRight(),
-                ModelConfiguration.ANIMALS_STARTING_COUNT);
+                this.configuration.getStartingAnimalsCount());
 
-        animalsSet = new HashSet<>(ModelConfiguration.ANIMALS_STARTING_COUNT);
+        animalsSet = new HashSet<>(this.configuration.getStartingAnimalsCount());
         for(Vector2d position : positionGenerator) {
-            Animal animal = new Animal(ModelConfiguration.ANIMAL_STARTING_ENERGY, position, genomeBehaviour);
+            Animal animal = new Animal(this.configuration.getAnimalStartingEnergy(), position, this.configuration);
             worldMap.place(animal);
             animalsSet.add(animal);
         }
 
-        grassGenerator = new EquatorGrassGenerator(worldMap.getWidth(), worldMap.getHeight());
-        grassGenerator.stream().limit(ModelConfiguration.GRASS_STARTING_COUNT).forEach(worldMap::place);
+        grassGenerator = new EquatorGrassGenerator(configuration.getMapWidth(), configuration.getMapHeight());
+        grassGenerator.stream().limit(this.configuration.getStartingGrassCount()).forEach(worldMap::place);
     }
 
     @Override
     public void run() {
-        int animalIndex = 0;
         /*
         * Handling exception thrown by Thread.sleep(), can't throw exception further because run is overridden function
         * */
@@ -54,7 +52,7 @@ public class Simulation implements Runnable {
                 processAnimalsReproduction();
                 processGrowNewGrass();
 
-                Thread.sleep(tickDelay);
+                Thread.sleep(configuration.getMillisecondsPerSimulationDay());
             }
         } catch(InterruptedException ex){
             System.out.println("Simulation stopped because simulation thread got interrupted!");
@@ -71,9 +69,7 @@ public class Simulation implements Runnable {
     }
 
     private void processMoveAnimals() {
-        for(Animal animal : animalsSet){
-            worldMap.move(animal);
-        }
+        animalsSet.forEach(worldMap::move);
     }
 
     private void processAnimalsEating() {
@@ -87,7 +83,7 @@ public class Simulation implements Runnable {
             Optional<Grass> grass = worldMap.getGrassAt(position);
             if(grass.isEmpty()) continue;
 
-            topAnimal.changeEnergy(ModelConfiguration.ANIMAL_ENERGY_GAIN_PER_PLANT);
+            topAnimal.changeEnergy(this.configuration.getGrassEnergyLevel());
             worldMap.remove(grass.get());
             grassGenerator.addFreePosition(position);
         }
@@ -115,7 +111,7 @@ public class Simulation implements Runnable {
 
     private void processGrowNewGrass() {
         grassGenerator.stream()
-                .limit(ModelConfiguration.GRASS_GROWTH_PER_EVOLUTION)
+                .limit(this.configuration.getGrassGrowthPerDay())
                 .forEach(worldMap::place);
     }
 }

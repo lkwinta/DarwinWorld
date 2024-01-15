@@ -2,8 +2,8 @@ package agh.ics.oop.presenter;
 
 import agh.ics.oop.model.world_elements.IWorldElement;
 import agh.ics.oop.model.world_elements.Vector2d;
+import agh.ics.oop.model.world_map.AbstractWorldMap;
 import agh.ics.oop.model.world_map.Boundary;
-import agh.ics.oop.model.world_map.IWorldMap;
 import agh.ics.oop.util.WorldElementBoxFactory;
 
 import javafx.fxml.FXML;
@@ -13,9 +13,7 @@ import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.RowConstraints;
 import javafx.scene.layout.VBox;
-
-import java.util.Iterator;
-import java.util.List;
+import lombok.Setter;
 
 public class SimulationPresenter {
 
@@ -25,16 +23,13 @@ public class SimulationPresenter {
     private final Vector2d xAxisMask = new Vector2d(1, 0);
     private final Vector2d yAxisMask = new Vector2d(0, 1);
 
-    private IWorldMap worldMap;
+    @Setter
+    private AbstractWorldMap worldMap;
 
     @FXML
     private GridPane mapGridPane;
     @FXML
     private Label moveInformation;
-
-    public void setWorldMap(IWorldMap map){
-        worldMap = map;
-    }
 
     public void drawMap() {
         clearGrid();
@@ -53,6 +48,8 @@ public class SimulationPresenter {
                     element.getPosition().getX() + 1 - currentBounds.bottomLeft().getX(),
                     height - (element.getPosition().getY() - currentBounds.bottomLeft().getY()));
         }
+
+       // mapGridPane.getScene().getWindow().sizeToScene(); //TODO: fix this, suboptiaml solution
     }
 
     private void addConstraints(int width, int height) {

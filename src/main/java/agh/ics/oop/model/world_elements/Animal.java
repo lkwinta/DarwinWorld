@@ -1,8 +1,10 @@
 package agh.ics.oop.model.world_elements;
 
 import agh.ics.oop.model.ModelConfiguration;
+import agh.ics.oop.model.util.ConfigurationManager;
 import agh.ics.oop.model.world_map.IMoveHandler;
 import agh.ics.oop.model.world_map.MapDirection;
+import lombok.Getter;
 
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -12,17 +14,22 @@ import static java.lang.Math.max;
 
 public class Animal implements IWorldElement, Comparable<Animal> {
     private Vector2d position;
+    @Getter
     private MapDirection orientation;
     private int energyLevel;
     private final Genome genome;
+    private final ModelConfiguration configuration;
 
-    public Animal(int initialEnergyLevel, Vector2d initialPosition, IGenomeBehaviour genomeBehaviour){
-        this.genome = Genome.RandomGenome(ModelConfiguration.ANIMAL_GENES_LENGTH, genomeBehaviour);
+    public Animal(int initialEnergyLevel, Vector2d initialPosition, ModelConfiguration configuration){
+        this.configuration = configuration;
+
+        this.genome = Genome.RandomGenome(this.configuration.getGenomeLength(), this.configuration.getConstructedBehaviour());
         System.out.println(genome);
         initializeAnimal(initialEnergyLevel, initialPosition);
     }
 
-    private Animal(int initialEnergyLevel, Genome initialGenome, Vector2d initialPosition) {
+    private Animal(int initialEnergyLevel, Genome initialGenome, Vector2d initialPosition, ModelConfiguration configuration) {
+        this.configuration = configuration;
         this.genome = initialGenome;
         initializeAnimal(initialEnergyLevel, initialPosition);
         System.out.println(genome);
@@ -54,7 +61,7 @@ public class Animal implements IWorldElement, Comparable<Animal> {
             orientation = orientation.shift(Gene.ROTATION_180.ordinal());
         }
 
-        changeEnergy(-ModelConfiguration.ANIMAL_ENERGY_LOSS_PER_MOVE);
+        changeEnergy(-this.configuration.getAnimalEnergyLossPerMove());
     }
 
     public void changeEnergy(int energyDelta){
@@ -63,10 +70,6 @@ public class Animal implements IWorldElement, Comparable<Animal> {
 
     public boolean isAlive() {
         return energyLevel > 0;
-    }
-
-    public MapDirection getOrientation() {
-        return orientation;
     }
 
     @Override
@@ -81,10 +84,10 @@ public class Animal implements IWorldElement, Comparable<Animal> {
 
         Genome newGenome = getChildGenome(other, side, genesRatio);
 
-        this.changeEnergy(-ModelConfiguration.ANIMAL_ENERGY_LOSS_PER_CHILD);
-        other.changeEnergy(-ModelConfiguration.ANIMAL_ENERGY_LOSS_PER_CHILD);
+        this.changeEnergy(-this.configuration.getAnimalEnergyGivenToChild());
+        other.changeEnergy(-this.configuration.getAnimalEnergyGivenToChild());
 
-        return new Animal(2*ModelConfiguration.ANIMAL_ENERGY_LOSS_PER_CHILD, newGenome, other.getPosition());
+        return new Animal(2*this.configuration.getAnimalEnergyGivenToChild(), newGenome, other.getPosition(), this.configuration);
     }
 
     private Genome getChildGenome(Animal other, int side, float genesRatio) {
@@ -102,7 +105,7 @@ public class Animal implements IWorldElement, Comparable<Animal> {
     }
 
     public boolean canBreed() {
-        return energyLevel > ModelConfiguration.ANIMAL_READY_TO_BREED_ENERGY;
+        return energyLevel > this.configuration.getAnimalReadyToBreedEnergyLevel();
     }
 
     @Override

@@ -12,7 +12,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.stream.Stream;
 
-public abstract class AbstractWorldMap implements IWorldMap, IMoveHandler {
+public abstract class AbstractWorldMap implements IMoveHandler {
     protected final MapVisualizer mapVisualizer;
     protected final ConcurrentMap<Vector2d, List<Animal>> animalsMap;
     protected final ConcurrentMap<Vector2d, Grass> grassMap;
@@ -63,7 +63,6 @@ public abstract class AbstractWorldMap implements IWorldMap, IMoveHandler {
             map.remove(position);
     }
 
-    @Override
     public void place(IWorldElement object) {
         if(object instanceof Animal animal) {
             addToHashMap(animalsMap, animal.getPosition(), animal);
@@ -74,7 +73,6 @@ public abstract class AbstractWorldMap implements IWorldMap, IMoveHandler {
         }
     }
 
-    @Override
     public void remove(IWorldElement object) {
         if(object instanceof Animal animal) {
             removeFromHashMap(animalsMap, animal.getPosition(), animal);
@@ -85,7 +83,6 @@ public abstract class AbstractWorldMap implements IWorldMap, IMoveHandler {
         }
     }
 
-    @Override
     public void move(IWorldElement object) throws IllegalArgumentException {
         if(!(object instanceof Animal animal))
             throw new IllegalArgumentException("You can't move object that is not an Animal'");
@@ -107,17 +104,8 @@ public abstract class AbstractWorldMap implements IWorldMap, IMoveHandler {
             mapChanged("Cannot move animal at: %s".formatted(animal.getPosition()));
     }
 
-    @Override
     public boolean isOccupied(Vector2d position) {
         return objectsAt(position).isPresent();
-    }
-
-    public int getWidth() {
-        return this.width;
-    }
-
-    public int getHeight() {
-        return this.height;
     }
 
     public Optional<List<Animal>> getTopAnimalsAt(Vector2d position) {
@@ -134,7 +122,6 @@ public abstract class AbstractWorldMap implements IWorldMap, IMoveHandler {
         return Optional.of(grassMap.get(position));
     }
 
-    @Override
     public Optional<List<IWorldElement>> objectsAt(Vector2d position) {
         if(animalsMap.containsKey(position) || grassMap.containsKey(position))
             return Optional.of(
@@ -147,7 +134,6 @@ public abstract class AbstractWorldMap implements IWorldMap, IMoveHandler {
             return Optional.empty();
     }
 
-    @Override
     public List<IWorldElement> getElements() {
         return new ArrayList<>(
                 Streams.concat(
@@ -156,18 +142,15 @@ public abstract class AbstractWorldMap implements IWorldMap, IMoveHandler {
                 ).toList());
     }
 
-    @Override
     public String toString() {
         Boundary currentBounds = getCurrentBounds();
         return mapVisualizer.draw(currentBounds.bottomLeft(), currentBounds.topRight());
     }
 
-    @Override
     public Boundary getCurrentBounds() {
         return mapBoundary;
     }
 
-    @Override
     public UUID getId() {
         return mapId;
     }

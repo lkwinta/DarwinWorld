@@ -22,16 +22,23 @@ java {
 repositories {
     mavenCentral()
     javafx {
-        version = "17"
+        version = "21"
         modules = ['javafx.base', 'javafx.controls', 'javafx.fxml', 'javafx.graphics', 'javafx.media', 'javafx.swing', 'javafx.web']
     }
 }
 
 dependencies {
+    implementation("com.google.code.gson:gson:2.10.1")
     testImplementation platform('org.junit:junit-bom:5.9.1')
     testImplementation 'org.junit.jupiter:junit-jupiter'
 
     implementation("com.google.guava:guava:33.0.0-jre")
+
+    compileOnly 'org.projectlombok:lombok:1.18.30'
+    annotationProcessor 'org.projectlombok:lombok:1.18.30'
+
+    testCompileOnly 'org.projectlombok:lombok:1.18.30'
+    testAnnotationProcessor 'org.projectlombok:lombok:1.18.30'
 }
 
 test {

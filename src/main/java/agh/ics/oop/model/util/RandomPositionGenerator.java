@@ -13,7 +13,6 @@ import static java.lang.Math.min;
 public class RandomPositionGenerator implements Iterator<Vector2d>, Iterable<Vector2d> {
     private final int maxCount;
     private int currentIndex = 0;
-
     private final List<Vector2d> positions = new ArrayList<>();
 
     public RandomPositionGenerator(Vector2d bottomLeft, Vector2d topRight, int maxCount){
@@ -23,7 +22,13 @@ public class RandomPositionGenerator implements Iterator<Vector2d>, Iterable<Vec
         Collections.shuffle(widthRange);
         Collections.shuffle(heightRange);
 
-        Lists.cartesianProduct(widthRange, heightRange).stream().limit(maxCount).forEach(position -> positions.add(new Vector2d(position.get(0), position.get(1))));
+        List<Vector2d> cartesianResult = new ArrayList<>();
+
+        Lists.cartesianProduct(widthRange, heightRange)
+                .forEach(position -> cartesianResult.add(new Vector2d(position.get(0), position.get(1))));
+
+        Collections.shuffle(cartesianResult);
+        cartesianResult.stream().limit(maxCount).forEach(positions::add);
 
         this.maxCount = min(maxCount, positions.size());
     }
@@ -44,10 +49,6 @@ public class RandomPositionGenerator implements Iterator<Vector2d>, Iterable<Vec
     @Override
     public Iterator<Vector2d> iterator() {
         return this;
-    }
-
-    public int getMaxCount() {
-        return maxCount;
     }
 
     public Stream<Vector2d> stream(){
