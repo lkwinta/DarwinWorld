@@ -17,10 +17,12 @@ public class Simulation implements Runnable {
     private final AbstractWorldMap worldMap;
     private final EquatorGrassGenerator grassGenerator;
     private final ModelConfiguration configuration;
+    private final Statistics simulationStatistics;
 
-    public Simulation(AbstractWorldMap worldMap, ModelConfiguration configuration){
+    public Simulation(AbstractWorldMap worldMap, ModelConfiguration configuration, Statistics simulationStatistics) {
         this.worldMap = worldMap;
         this.configuration = configuration;
+        this.simulationStatistics = simulationStatistics;
 
         Boundary mapBounds = worldMap.getCurrentBounds();
         RandomPositionGenerator positionGenerator = new RandomPositionGenerator(

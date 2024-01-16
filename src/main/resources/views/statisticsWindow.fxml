@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox spacing="10.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="agh.ics.oop.presenter.StatisticsWindowPresenter">
+    <Label text="Simulation statistics:" VBox.vgrow="ALWAYS"/>
+    <HBox spacing="10.0">
+        <Label contentDisplay="RIGHT" text="Day number: "/>
+        <Pane HBox.hgrow="ALWAYS"/>
+        <Label fx:id="dayNumberLabel" text="0"/>
+    </HBox>
+    <HBox spacing="10.0">
+        <Label contentDisplay="RIGHT" text="Animal Count: "/>
+        <Pane HBox.hgrow="ALWAYS"/>
+        <Label fx:id="animalCountLabel" text="0"/>
+    </HBox>
+    <HBox spacing="10.0">
+        <Label contentDisplay="RIGHT" text="Grass Count: "/>
+        <Pane HBox.hgrow="ALWAYS"/>
+        <Label fx:id="grassCountLabel" text="0"/>
+    </HBox>
+    <HBox spacing="10.0">
+        <Label contentDisplay="RIGHT" text="Average energy: "/>
+        <Pane HBox.hgrow="ALWAYS"/>
+        <Label fx:id="averageEnergyLabel" text="0"/>
+    </HBox>
+    <HBox spacing="10.0">
+        <Label contentDisplay="RIGHT" text="Average life span: "/>
+        <Pane HBox.hgrow="ALWAYS"/>
+        <Label fx:id="averageLifeSpanLabel" text="0"/>
+    </HBox>
+    <HBox spacing="10.0">
+        <Label contentDisplay="RIGHT" text="Average children count: "/>
+        <Pane HBox.hgrow="ALWAYS"/>
+        <Label fx:id="averageChildrenCountLabel" text="0"/>
+    </HBox>
+    <HBox spacing="10.0">
+        <Label contentDisplay="RIGHT" text="Dominant genotype: "/>
+        <Pane HBox.hgrow="ALWAYS"/>
+        <Label fx:id="dominantGenotypeLabel" text="0"/>
+    </HBox>
+    <padding>
+        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
+    </padding>
+</VBox>

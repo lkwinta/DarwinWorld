@@ -3,6 +3,7 @@ package agh.ics.oop.presenter;
 import agh.ics.oop.SimulationEngine;
 import agh.ics.oop.model.ModelConfiguration;
 import agh.ics.oop.model.Simulation;
+import agh.ics.oop.model.Statistics;
 import agh.ics.oop.model.util.ConfigurationManager;
 import agh.ics.oop.model.world_map.AbstractWorldMap;
 import javafx.application.Platform;
@@ -99,6 +100,7 @@ public class SimulationConfigurationPresenter {
     private void onSimulationStartClicked() {
         try {
             FXMLLoader fxmlLoader = new FXMLLoader();
+
             fxmlLoader.setLocation(getClass().getClassLoader().getResource("views/simulation.fxml"));
 
             BorderPane viewRoot = fxmlLoader.load();
@@ -107,7 +109,16 @@ public class SimulationConfigurationPresenter {
 
             ModelConfiguration configuration = getCurrentConfiguration();
             AbstractWorldMap map = getAbstractWorldMap(fxmlLoader, configuration);
-            Simulation simulation = new Simulation(map, configuration);
+
+            FXMLLoader fxmlLoaderStatistics = new FXMLLoader();
+            fxmlLoaderStatistics.setLocation(getClass().getClassLoader().getResource("views/statistics.fxml"));
+            fxmlLoaderStatistics.load();
+
+            StatisticsWindowPresenter statisticsPresenter =  fxmlLoader.getController();
+            Statistics statistics = new Statistics();
+            statisticsPresenter.subscribeStatisticListeners(statistics);
+
+            Simulation simulation = new Simulation(map, configuration, statistics);
 
             int id = simulationEngine.runSingleAsync(simulation);
 

@@ -1,6 +1,11 @@
 package agh.ics.oop;
 
 import agh.ics.oop.model.util.ConfigurationManager;
+import agh.ics.oop.model.world_elements.Gene;
+
+import java.util.ArrayList;
+import java.util.List;
+
 public class WorldTest {
     public static void main(String[] args) {
         //AbstractWorldMap map = new EarthMap(ModelConfigurationTest.MAP_WIDTH, ModelConfigurationTest.MAP_HEIGHT);
