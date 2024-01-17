@@ -24,9 +24,10 @@ public class SimulationPresenter {
 
     private final Vector2d xAxisMask = new Vector2d(1, 0);
     private final Vector2d yAxisMask = new Vector2d(0, 1);
-
-    @Setter
     private AbstractWorldMap worldMap;
+    private int width;
+    private int height;
+
     @FXML
     private GridPane mapGridPane;
     @FXML
@@ -38,40 +39,37 @@ public class SimulationPresenter {
         clearGrid();
 
         Boundary currentBounds = worldMap.getCurrentBounds();
-        int width = currentBounds.topRight().x() - currentBounds.bottomLeft().x() + 1;
-        int height = currentBounds.topRight().y() - currentBounds.bottomLeft().y() + 1;
 
-        addConstraints(width, height);
-        createAxes(width, height, currentBounds);
+        createAxes();
 
         for(IWorldElement element : worldMap.getElements()){
             VBox elementBox = WorldElementBoxFactory.getWorldElementBox(element);
             GridPane.setHalignment(elementBox, HPos.CENTER);
             mapGridPane.add(elementBox,
                     element.position().x() + 1 - currentBounds.bottomLeft().x(),
-                    height - (element.position().y() - currentBounds.bottomLeft().y()));
+                    this.height - (element.position().y() - currentBounds.bottomLeft().y()));
         }
-
-       // mapGridPane.getScene().getWindow().sizeToScene(); //TODO: fix this, suboptiaml solution
     }
 
-    private void addConstraints(int width, int height) {
-        while(mapGridPane.getColumnConstraints().size() <= width){
+    private void addConstraints() {
+        while(mapGridPane.getColumnConstraints().size() <= this.width){
             mapGridPane.getColumnConstraints().add(new ColumnConstraints(CELL_WIDTH));
         }
 
-        while(mapGridPane.getRowConstraints().size() <= height){
+        while(mapGridPane.getRowConstraints().size() <= this.height){
             mapGridPane.getRowConstraints().add(new RowConstraints(CELL_HEIGHT));
         }
     }
 
-    private void createAxes(int width, int height, Boundary currentBounds) {
+    private void createAxes() {
+        Boundary currentBounds = worldMap.getCurrentBounds();
+
         Label yx = new Label("y/x");
         GridPane.setHalignment(yx, HPos.CENTER);
         mapGridPane.add(yx, 0, 0);
 
-        createAxis(width, currentBounds.bottomLeft().x(), 1, xAxisMask);
-        createAxis(height, currentBounds.topRight().y(), -1, yAxisMask);
+        createAxis(this.width, currentBounds.bottomLeft().x(), 1, xAxisMask);
+        createAxis(this.height, currentBounds.topRight().y(), -1, yAxisMask);
     }
 
     private void createAxis(int size, int start_value, int step, Vector2d axis_mask) {
@@ -84,14 +82,21 @@ public class SimulationPresenter {
         }
     }
 
-    public void setMoveInformationLabel(String text) {
-        moveInformation.setText(text);
-    }
-
     private void clearGrid() {
         mapGridPane.getChildren().retainAll(mapGridPane.getChildren().get(0)); // hack to retain visible grid lines
-        mapGridPane.getColumnConstraints().clear();
-        mapGridPane.getRowConstraints().clear();
+    }
+
+    public void setup(AbstractWorldMap worldMap, int width, int height) {
+        this.worldMap = worldMap;
+        this.width = width;
+        this.height = height;
+
+        addConstraints();
+        createAxes();
+    }
+
+    public void setMoveInformationLabel(String text) {
+        moveInformation.setText(text);
     }
 
     public void subscribeStatisticsListeners(Statistics statistics) {

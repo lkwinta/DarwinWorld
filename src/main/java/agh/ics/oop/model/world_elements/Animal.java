@@ -21,7 +21,6 @@ public class Animal implements IWorldElement, Comparable<Animal> {
         this.configuration = configuration;
 
         this.genome = Genome.RandomGenome(this.configuration.getGenomeLength(), this.configuration.getConstructedBehaviour());
-        System.out.println(genome);
         initializeAnimal(initialEnergyLevel, initialPosition);
     }
 

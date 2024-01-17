@@ -1,5 +1,6 @@
 package agh.ics.oop.model;
 
+import agh.ics.oop.ISimulationTickListener;
 import agh.ics.oop.model.util.RandomPositionGenerator;
 import agh.ics.oop.model.world_elements.*;
 import agh.ics.oop.model.world_map.AbstractWorldMap;
@@ -18,13 +19,14 @@ public class Simulation implements Runnable {
     private final EquatorGrassGenerator grassGenerator;
     private final ModelConfiguration configuration;
     private final Statistics simulationStatistics;
-
     private int dayNumber = 0;
+    private final List<ISimulationTickListener> listeners;
 
     public Simulation(AbstractWorldMap worldMap, ModelConfiguration configuration, Statistics simulationStatistics) {
         this.worldMap = worldMap;
         this.configuration = configuration;
         this.simulationStatistics = simulationStatistics;
+        this.listeners = new ArrayList<>();
 
         Boundary mapBounds = worldMap.getCurrentBounds();
         RandomPositionGenerator positionGenerator = new RandomPositionGenerator(
@@ -57,12 +59,17 @@ public class Simulation implements Runnable {
                 processGrowNewGrass();
 
                 updateStatistics();
+                notifyListeners();
 
                 Thread.sleep(configuration.getMillisecondsPerSimulationDay());
             }
         } catch(InterruptedException ex){
             System.out.println("Simulation stopped because simulation thread got interrupted!");
         }
+    }
+
+    public void addListener(ISimulationTickListener listener){
+        listeners.add(listener);
     }
 
     private void updateStatistics() {
@@ -125,5 +132,9 @@ public class Simulation implements Runnable {
         grassGenerator.stream()
                 .limit(this.configuration.getGrassGrowthPerDay())
                 .forEach(worldMap::place);
+    }
+
+    private void notifyListeners(){
+        listeners.forEach(ISimulationTickListener::onSimulationTick);
     }
 }

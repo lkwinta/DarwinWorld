@@ -18,6 +18,7 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -109,17 +110,10 @@ public class SimulationConfigurationPresenter {
             BorderPane viewRoot = fxmlLoader.load();
             Stage stage = new Stage();
             configureStage(stage, viewRoot);
-
-            ModelConfiguration configuration = getCurrentConfiguration();
+           
             SimulationPresenter simulationPresenter = fxmlLoader.getController();
 
-            AbstractWorldMap map = getAbstractWorldMap(simulationPresenter, configuration);
-
-            Statistics statistics = new Statistics();
-            simulationPresenter.subscribeStatisticsListeners(statistics);
-            Simulation simulation = new Simulation(map, configuration, statistics);
-
-            int id = simulationEngine.runSingleAsync(simulation);
+            int id = simulationEngine.runSingleAsync(getSimulation(simulationPresenter));
 
             stage.setOnCloseRequest(event -> simulationEngine.interruptSingleSimulation(id));
 
@@ -134,6 +128,20 @@ public class SimulationConfigurationPresenter {
             System.out.println("Could not load fxml file: " + ex.getMessage());
             Platform.exit();
         }
+    }
+
+    @NotNull
+    private Simulation getSimulation(SimulationPresenter simulationPresenter) {
+        ModelConfiguration configuration = getCurrentConfiguration();
+        AbstractWorldMap map = configuration.getConstructedMap();
+        simulationPresenter.setup(map, configuration.getMapWidth(), configuration.getMapHeight());
+
+        Statistics statistics = new Statistics();
+        simulationPresenter.subscribeStatisticsListeners(statistics);
+        Simulation simulation = new Simulation(map, configuration, statistics);
+        simulation.addListener(() -> Platform.runLater(simulationPresenter::drawMap));
+
+        return simulation;
     }
 
     @FXML
@@ -209,17 +217,7 @@ public class SimulationConfigurationPresenter {
             System.out.println("Failed to save configurations with error: " + ex.getMessage());
         }
     }
-
-    private AbstractWorldMap getAbstractWorldMap(SimulationPresenter presenter, ModelConfiguration configuration) {
-        AbstractWorldMap map = configuration.getConstructedMap();
-        presenter.setWorldMap(map);
-
-        map.addListener((worldMap, message) -> Platform.runLater(presenter::drawMap));
-        map.addListener((worldMap, message) -> Platform.runLater(() -> presenter.setMoveInformationLabel(message)));
-
-        return map;
-    }
-
+    
     public void onConfigurationApplicationClose() throws InterruptedException {
         simulationEngine.interruptAllSimulations();
         simulationEngine.awaitAllSimulationsEnd();
