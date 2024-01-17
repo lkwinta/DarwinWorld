@@ -1,5 +1,6 @@
 package agh.ics.oop.presenter;
 
+import agh.ics.oop.model.Statistics;
 import agh.ics.oop.model.world_elements.IWorldElement;
 import agh.ics.oop.model.world_elements.Vector2d;
 import agh.ics.oop.model.world_map.AbstractWorldMap;
@@ -8,6 +9,7 @@ import agh.ics.oop.util.WorldElementBoxFactory;
 
 import javafx.fxml.FXML;
 import javafx.geometry.HPos;
+import javafx.scene.Parent;
 import javafx.scene.control.Label;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
@@ -25,11 +27,12 @@ public class SimulationPresenter {
 
     @Setter
     private AbstractWorldMap worldMap;
-
     @FXML
     private GridPane mapGridPane;
     @FXML
     private Label moveInformation;
+    @FXML
+    private StatisticsWindowPresenter statisticsViewController;
 
     public void drawMap() {
         clearGrid();
@@ -91,4 +94,7 @@ public class SimulationPresenter {
         mapGridPane.getRowConstraints().clear();
     }
 
+    public void subscribeStatisticsListeners(Statistics statistics) {
+        statisticsViewController.subscribeStatisticListeners(statistics);
+    }
 }

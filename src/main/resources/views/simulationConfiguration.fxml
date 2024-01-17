@@ -95,8 +95,10 @@
                                 </ComboBox>
                                 <Label text="Genome length:" />
                                 <TextField fx:id="genomeLengthTextField" />
-                                <Label text="Mutations count:" />
-                                <TextField fx:id="mutationsCountTextField" />
+                                <Label text="Minimal mutations count:" />
+                                <TextField fx:id="minimalMutationsCountTextField"/>
+                                <Label text="Maximal mutations count:" />
+                                <TextField fx:id="maximalMutationsCountTextField" />
                             </children>
                         </VBox>
                         <VBox spacing="5.0">

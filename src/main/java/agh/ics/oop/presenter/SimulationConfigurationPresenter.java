@@ -76,7 +76,10 @@ public class SimulationConfigurationPresenter {
     private TextField genomeLengthTextField;
 
     @FXML
-    private TextField mutationsCountTextField;
+    private TextField minimalMutationsCountTextField;
+
+    @FXML
+    private TextField maximalMutationsCountTextField;
 
     @FXML
     private TextField millisecondsPerSimulationDayTextField;
@@ -108,16 +111,12 @@ public class SimulationConfigurationPresenter {
             configureStage(stage, viewRoot);
 
             ModelConfiguration configuration = getCurrentConfiguration();
-            AbstractWorldMap map = getAbstractWorldMap(fxmlLoader, configuration);
+            SimulationPresenter simulationPresenter = fxmlLoader.getController();
 
-            FXMLLoader fxmlLoaderStatistics = new FXMLLoader();
-            fxmlLoaderStatistics.setLocation(getClass().getClassLoader().getResource("views/statistics.fxml"));
-            fxmlLoaderStatistics.load();
+            AbstractWorldMap map = getAbstractWorldMap(simulationPresenter, configuration);
 
-            StatisticsWindowPresenter statisticsPresenter =  fxmlLoader.getController();
             Statistics statistics = new Statistics();
-            statisticsPresenter.subscribeStatisticListeners(statistics);
-
+            simulationPresenter.subscribeStatisticsListeners(statistics);
             Simulation simulation = new Simulation(map, configuration, statistics);
 
             int id = simulationEngine.runSingleAsync(simulation);
@@ -211,9 +210,7 @@ public class SimulationConfigurationPresenter {
         }
     }
 
-    private AbstractWorldMap getAbstractWorldMap(FXMLLoader fxmlLoader, ModelConfiguration configuration) {
-        SimulationPresenter presenter = fxmlLoader.getController();
-
+    private AbstractWorldMap getAbstractWorldMap(SimulationPresenter presenter, ModelConfiguration configuration) {
         AbstractWorldMap map = configuration.getConstructedMap();
         presenter.setWorldMap(map);
 
@@ -291,7 +288,8 @@ public class SimulationConfigurationPresenter {
             modelConfiguration.setGenomeBehaviour(ModelConfiguration.GenomeBehaviour.A_BIT_OF_MADNESS);
 
         modelConfiguration.setGenomeLength(Integer.parseInt(genomeLengthTextField.getText()));
-        modelConfiguration.setMutationsCount(Integer.parseInt(mutationsCountTextField.getText()));
+        modelConfiguration.setMinimalMutationsCount(Integer.parseInt(minimalMutationsCountTextField.getText()));
+        modelConfiguration.setMaximalMutationsCount(Integer.parseInt(maximalMutationsCountTextField.getText()));
 
         return modelConfiguration;
     }
@@ -329,7 +327,8 @@ public class SimulationConfigurationPresenter {
             genomeBehaviourSelector.setValue("ABitOfMadness");
 
         genomeLengthTextField.setText(String.valueOf(modelConfiguration.getGenomeLength()));
-        mutationsCountTextField.setText(String.valueOf(modelConfiguration.getMutationsCount()));
+        minimalMutationsCountTextField.setText(String.valueOf(modelConfiguration.getMinimalMutationsCount()));
+        maximalMutationsCountTextField.setText(String.valueOf(modelConfiguration.getMaximalMutationsCount()));
     }
 
     private void logError(String message) {

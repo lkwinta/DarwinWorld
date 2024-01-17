@@ -41,8 +41,11 @@ public class Genome {
         return genome;
     }
 
-    public void mutate() {
-        int mutationsCount = ThreadLocalRandom.current().nextInt(0, length + 1);
+    public void mutate(int minimumMutationsCount, int maximumMutationsCount) {
+        if(maximumMutationsCount - minimumMutationsCount <= 0)
+            return;
+
+        int mutationsCount = ThreadLocalRandom.current().nextInt(minimumMutationsCount, maximumMutationsCount);
         int[] indexes = ThreadLocalRandom.current()
                 .ints(0, length)
                 .distinct()

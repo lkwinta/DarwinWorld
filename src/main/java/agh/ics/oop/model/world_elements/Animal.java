@@ -29,7 +29,6 @@ public class Animal implements IWorldElement, Comparable<Animal> {
         this.configuration = configuration;
         this.genome = initialGenome;
         initializeAnimal(initialEnergyLevel, initialPosition);
-        System.out.println(genome);
     }
 
     private void initializeAnimal(int initialEnergyLevel, Vector2d initialPosition){
@@ -58,11 +57,11 @@ public class Animal implements IWorldElement, Comparable<Animal> {
             orientation = orientation.shift(Gene.ROTATION_180.ordinal());
         }
 
-        changeEnergy(-this.configuration.getAnimalEnergyLossPerMove());
+        this.energyLevel -= this.configuration.getAnimalEnergyLossPerMove();
     }
 
-    public void changeEnergy(int energyDelta){
-        energyLevel += energyDelta;
+    public void eat(){
+        energyLevel += this.configuration.getGrassEnergyLevel();
     }
 
     public boolean isAlive() {
@@ -81,8 +80,8 @@ public class Animal implements IWorldElement, Comparable<Animal> {
 
         Genome newGenome = getChildGenome(other, side, genesRatio);
 
-        this.changeEnergy(-this.configuration.getAnimalEnergyGivenToChild());
-        other.changeEnergy(-this.configuration.getAnimalEnergyGivenToChild());
+        this.energyLevel -= this.configuration.getAnimalEnergyGivenToChild();
+        other.energyLevel -= this.configuration.getAnimalEnergyGivenToChild();
 
         return new Animal(2*this.configuration.getAnimalEnergyGivenToChild(), newGenome, other.position(), this.configuration);
     }
@@ -97,7 +96,7 @@ public class Animal implements IWorldElement, Comparable<Animal> {
             default -> throw new IllegalStateException("Unexpected value: " + side);
         };
 
-        newGenome.mutate();
+        newGenome.mutate(this.configuration.getMinimalMutationsCount(), this.configuration.getMaximalMutationsCount());
         return newGenome;
     }
 

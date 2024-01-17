@@ -155,4 +155,8 @@ public abstract class AbstractWorldMap implements IMoveHandler {
     public UUID getId() {
         return mapId;
     }
+
+    public int getGrassCount() {
+        return grassMap.size();
+    }
 }

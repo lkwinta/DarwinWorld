@@ -19,6 +19,8 @@ public class Simulation implements Runnable {
     private final ModelConfiguration configuration;
     private final Statistics simulationStatistics;
 
+    private int dayNumber = 0;
+
     public Simulation(AbstractWorldMap worldMap, ModelConfiguration configuration, Statistics simulationStatistics) {
         this.worldMap = worldMap;
         this.configuration = configuration;
@@ -54,11 +56,19 @@ public class Simulation implements Runnable {
                 processAnimalsReproduction();
                 processGrowNewGrass();
 
+                updateStatistics();
+
                 Thread.sleep(configuration.getMillisecondsPerSimulationDay());
             }
         } catch(InterruptedException ex){
             System.out.println("Simulation stopped because simulation thread got interrupted!");
         }
+    }
+
+    private void updateStatistics() {
+        simulationStatistics.getDayNumber().setValue(++dayNumber);
+        simulationStatistics.getAnimalCount().setValue(animalsSet.size());
+        simulationStatistics.getGrassCount().setValue(worldMap.getGrassCount());
     }
 
     private void processRemoveDeadAnimals() {
@@ -85,7 +95,7 @@ public class Simulation implements Runnable {
             Optional<Grass> grass = worldMap.getGrassAt(position);
             if(grass.isEmpty()) continue;
 
-            topAnimal.changeEnergy(this.configuration.getGrassEnergyLevel());
+            topAnimal.eat();
             worldMap.remove(grass.get());
             grassGenerator.addFreePosition(position);
         }

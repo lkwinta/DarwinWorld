@@ -27,7 +27,7 @@
     </center>
     <left>
         <VBox alignment="CENTER">
-            <fx:include source="statisticsWindow.fxml"/>
+            <fx:include fx:id="statisticsView" source="statisticsWindow.fxml"/>
         </VBox>
     </left>
 </BorderPane>

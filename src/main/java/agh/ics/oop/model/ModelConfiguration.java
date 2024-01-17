@@ -37,7 +37,8 @@ public class ModelConfiguration {
     private int animalEnergyGivenToChild = 20;
     private GenomeBehaviour genomeBehaviour = GenomeBehaviour.FULL_PREDESTINATION;
     private int genomeLength = 8;
-    private int mutationsCount = 1;
+    private int minimalMutationsCount = 1;
+    private int maximalMutationsCount = 3;
     private int startingOceanCount = 3;
     private int maxOceanSize = 5;
     private int oceanChangeRate = 10;
