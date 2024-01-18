@@ -13,6 +13,7 @@ import javafx.fxml.FXML;
 import javafx.geometry.HPos;
 import javafx.scene.Parent;
 import javafx.scene.control.Label;
+import javafx.scene.control.ToggleButton;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
@@ -20,26 +21,26 @@ import javafx.scene.layout.RowConstraints;
 import javafx.scene.layout.VBox;
 
 public class SimulationPresenter {
-
     private final static int CELL_WIDTH = 20;
     private final static int CELL_HEIGHT = 20;
-
     private final Vector2d xAxisMask = new Vector2d(1, 0);
     private final Vector2d yAxisMask = new Vector2d(0, 1);
-
     private AbstractWorldMap worldMap;
     private int width;
     private int height;
+    private Simulation simulation;
 
     @FXML
     private GridPane mapGridPane;
-
     /* Kinda hacking approach to divide view, statisticsViewController name is derived automatically by included fx:id*/
     @FXML
     private Parent statisticsView;
     @FXML
     private StatisticsWindowPresenter statisticsViewController; // It is assigned from simulationWindow.fxml - file included in simulation.fxml
-    private Simulation simulation;
+    @FXML
+    private ToggleButton pauseToggleButton;
+    @FXML
+    private ToggleButton resumeToggleButton;
 
     public void drawMap() {
         //clear grid
@@ -104,12 +105,18 @@ public class SimulationPresenter {
     }
 
     @FXML
-    private void onPlayClick(ActionEvent actionEvent) {
+    private void onPlayClick() {
+        resumeToggleButton.setSelected(true);
+        pauseToggleButton.setSelected(false);
+
         simulation.resume();
     }
 
     @FXML
-    private void onPauseClick(ActionEvent actionEvent) {
+    private void onPauseClick() {
+        resumeToggleButton.setSelected(false);
+        pauseToggleButton.setSelected(true);
+
         simulation.pause();
     }
 }

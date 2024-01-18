@@ -9,6 +9,7 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
+<?import javafx.scene.control.ToggleButton?>
 <BorderPane minHeight="550.0" minWidth="850.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="agh.ics.oop.presenter.SimulationPresenter">
     <top>
@@ -32,20 +33,20 @@
             <padding>
                 <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
             </padding>
-            <Button mnemonicParsing="false" onAction="#onPauseClick">
+            <ToggleButton fx:id="pauseToggleButton" mnemonicParsing="false" onAction="#onPauseClick">
                 <graphic>
                     <ImageView>
                         <Image url="@../textures/pause.png"/>
                     </ImageView>
                 </graphic>
-            </Button>
-            <Button mnemonicParsing="false" onAction="#onPlayClick">
+            </ToggleButton>
+            <ToggleButton selected="true" fx:id="resumeToggleButton" mnemonicParsing="false" onAction="#onPlayClick">
                 <graphic>
                     <ImageView>
                         <Image url="@../textures/play.png"/>
                     </ImageView>
                 </graphic>
-            </Button>
+            </ToggleButton>
         </HBox>
     </bottom>
 </BorderPane>
