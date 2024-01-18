@@ -1,12 +1,15 @@
 package agh.ics.oop.model;
 
-import agh.ics.oop.ISimulationTickListener;
+import agh.ics.oop.ISimulationEventListener;
 import agh.ics.oop.model.util.RandomPositionGenerator;
 import agh.ics.oop.model.world_elements.*;
 import agh.ics.oop.model.world_map.AbstractWorldMap;
 import agh.ics.oop.model.world_map.Boundary;
 import agh.ics.oop.model.world_map.EquatorGrassGenerator;
+import lombok.Getter;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Predicate;
@@ -19,13 +22,16 @@ public class Simulation implements Runnable {
     private final AbstractWorldMap worldMap;
     private final EquatorGrassGenerator grassGenerator;
     private final ModelConfiguration configuration;
+    @Getter
     private final Statistics simulationStatistics;
-    private final Map<SimulationEvent, List<ISimulationTickListener>> listeners;
+    private final Map<SimulationEvent, List<ISimulationEventListener>> listeners;
     private final Map<GenomeView, Integer> genomeCount;
     private int dayNumber = 0;
     private double averageLifeSpan = 0;
     private int deadAnimalsCount = 0;
     private final AtomicBoolean simulationPaused;
+    @Getter
+    private final String simulationId;
 
     public enum SimulationEvent {
         TICK,
@@ -58,6 +64,9 @@ public class Simulation implements Runnable {
 
         grassGenerator = new EquatorGrassGenerator(configuration.getMapWidth(), configuration.getMapHeight());
         grassGenerator.stream().limit(this.configuration.getStartingGrassCount()).forEach(worldMap::place);
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy_MM_dd_HH_mm_ss_SSS");
+        simulationId = "simulation_" + LocalDateTime.now().format(formatter);
     }
 
     @Override
@@ -99,14 +108,14 @@ public class Simulation implements Runnable {
         return this.dayNumber < configuration.getTotalSimulationDays();
     }
 
-    public void addListener(SimulationEvent event, ISimulationTickListener listener){
+    public void addListener(SimulationEvent event, ISimulationEventListener listener){
         if(!listeners.containsKey(event))
             listeners.put(event, new ArrayList<>());
 
         listeners.get(event).add(listener);
     }
 
-    public void removeListener(SimulationEvent event, ISimulationTickListener listener){
+    public void removeListener(SimulationEvent event, ISimulationEventListener listener){
         if(!listeners.containsKey(event))
             throw new IllegalArgumentException("Given listener is not subscribed");
 
@@ -219,6 +228,6 @@ public class Simulation implements Runnable {
 
     private void notifyListeners(SimulationEvent event){
         if(listeners.containsKey(event))
-            listeners.get(event).forEach(ISimulationTickListener::onSimulationTick);
+            listeners.get(event).forEach((listener) -> listener.onSimulationEvent(this));
     }
 }

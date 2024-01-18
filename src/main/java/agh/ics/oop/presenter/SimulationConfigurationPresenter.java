@@ -4,6 +4,7 @@ import agh.ics.oop.SimulationEngine;
 import agh.ics.oop.model.ModelConfiguration;
 import agh.ics.oop.model.Simulation;
 import agh.ics.oop.model.Statistics;
+import agh.ics.oop.model.util.CSVSaver;
 import agh.ics.oop.model.util.ConfigurationManager;
 import agh.ics.oop.model.world_map.AbstractWorldMap;
 import javafx.application.Platform;
@@ -138,6 +139,9 @@ public class SimulationConfigurationPresenter {
 
         Statistics statistics = new Statistics();
         Simulation simulation = new Simulation(map, configuration, statistics);
+
+        if(statisticsCSVSaveCheckbox.isSelected())
+            simulation.addListener(Simulation.SimulationEvent.TICK, new CSVSaver());
 
         simulationPresenter.subscribeStatisticsListeners(statistics);
         simulationPresenter.setup(map, configuration.getMapWidth(), configuration.getMapHeight(), simulation);

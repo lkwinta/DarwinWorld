@@ -13,7 +13,6 @@ import lombok.ToString;
 
 import java.util.List;
 
-@ToString
 @Getter
 public class Statistics {
     private final ObjectProperty<Integer> dayNumber = new SimpleObjectProperty<>();
@@ -25,4 +24,29 @@ public class Statistics {
     private final ObjectProperty<Double> averageLifeSpan = new SimpleObjectProperty<>();
     private final ObjectProperty<Double> averageChildrenCount = new SimpleObjectProperty<>();
     private final ObjectProperty<GenomeView> dominateGenome = new SimpleObjectProperty<>();
+
+    public String getCsvNames() {
+        return "dayNumber;" +
+                "freePositions;" +
+                "animalsCount;" +
+                "deadAnimalsCount;" +
+                "grassCount;" +
+                "averageEnergy;" +
+                "averageLifeSpan;" +
+                "averageChildrenCount;" +
+                "dominateGenome";
+    }
+
+    @Override
+    public String toString() {
+        return dayNumber.get() + ";" +
+                freePositions.get() + ";" +
+                animalsCount.get() + ";" +
+                deadAnimalsCount.get() + ";" +
+                grassCount.get() + ";" +
+                averageEnergy.get() + ";" +
+                averageLifeSpan.get() + ";" +
+                averageChildrenCount.get() + ";" +
+                dominateGenome.get();
+    }
 }

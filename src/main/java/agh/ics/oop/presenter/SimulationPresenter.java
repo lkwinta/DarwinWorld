@@ -109,16 +109,16 @@ public class SimulationPresenter {
         Rectangle2D screenSize = Screen.getPrimary().getBounds();
 
         this.cellSize = Math.min(
-                (int)Math.round(clamp(screenSize.getHeight()*0.75/height, 5, 50)),
-                (int)Math.round(clamp(screenSize.getWidth()*0.75/width, 5, 50)));
+                (int)Math.round(clamp(screenSize.getHeight()*0.75/height, 3, 50)),
+                (int)Math.round(clamp(screenSize.getWidth()*0.75/width, 3, 50)));
 
         addConstraints();
         createAxes();
 
-        simulation.addListener(Simulation.SimulationEvent.TICK, () -> Platform.runLater(this::drawMap));
-        simulation.addListener(Simulation.SimulationEvent.PAUSE, () -> Platform.runLater(this::showSimulationPaused));
-        simulation.addListener(Simulation.SimulationEvent.RESUME, () -> Platform.runLater(this::showSimulationResumed));
-        simulation.addListener(Simulation.SimulationEvent.END, () -> Platform.runLater(this::showSimulationEnded));
+        simulation.addListener(Simulation.SimulationEvent.TICK, (sim) -> Platform.runLater(this::drawMap));
+        simulation.addListener(Simulation.SimulationEvent.PAUSE, (sim) -> Platform.runLater(this::showSimulationPaused));
+        simulation.addListener(Simulation.SimulationEvent.RESUME, (sim) -> Platform.runLater(this::showSimulationResumed));
+        simulation.addListener(Simulation.SimulationEvent.END, (sim) -> Platform.runLater(this::showSimulationEnded));
     }
 
     private void showSimulationEnded() {
