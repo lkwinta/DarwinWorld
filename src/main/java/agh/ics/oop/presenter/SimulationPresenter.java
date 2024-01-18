@@ -8,6 +8,7 @@ import agh.ics.oop.model.world_map.AbstractWorldMap;
 import agh.ics.oop.model.world_map.Boundary;
 import agh.ics.oop.util.WorldElementBoxFactory;
 
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.geometry.HPos;
@@ -19,6 +20,7 @@ import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.RowConstraints;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 
 public class SimulationPresenter {
     private final static int CELL_WIDTH = 20;
@@ -29,6 +31,7 @@ public class SimulationPresenter {
     private int width;
     private int height;
     private Simulation simulation;
+    private boolean simulationEnded = false;
 
     @FXML
     private GridPane mapGridPane;
@@ -41,8 +44,10 @@ public class SimulationPresenter {
     private ToggleButton pauseToggleButton;
     @FXML
     private ToggleButton resumeToggleButton;
+    @FXML
+    private Label simulationStatusLabel;
 
-    public void drawMap() {
+    private void drawMap() {
         //clear grid
         mapGridPane.getChildren().retainAll(mapGridPane.getChildren().get(0));
 
@@ -98,6 +103,33 @@ public class SimulationPresenter {
 
         addConstraints();
         createAxes();
+
+        simulation.addListener(Simulation.SimulationEvent.TICK, () -> Platform.runLater(this::drawMap));
+        simulation.addListener(Simulation.SimulationEvent.PAUSE, () -> Platform.runLater(this::showSimulationPaused));
+        simulation.addListener(Simulation.SimulationEvent.RESUME, () -> Platform.runLater(this::showSimulationResumed));
+        simulation.addListener(Simulation.SimulationEvent.END, () -> Platform.runLater(this::showSimulationEnded));
+    }
+
+    private void showSimulationEnded() {
+        simulationStatusLabel.setText("Simulation has ended");
+        simulationStatusLabel.setTextFill(Color.RED);
+        simulationEnded = true;
+    }
+
+    private void showSimulationResumed() {
+        if(simulationEnded)
+            return;
+
+        simulationStatusLabel.setText("Simulation is running");
+        simulationStatusLabel.setTextFill(Color.GREEN);
+    }
+
+    private void showSimulationPaused() {
+        if(simulationEnded)
+            return;
+
+        simulationStatusLabel.setText("Simulation has been paused");
+        simulationStatusLabel.setTextFill(Color.ORANGE);
     }
 
     public void subscribeStatisticsListeners(Statistics statistics) {

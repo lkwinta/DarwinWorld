@@ -21,18 +21,26 @@ public class Simulation implements Runnable {
     private final EquatorGrassGenerator grassGenerator;
     private final ModelConfiguration configuration;
     private final Statistics simulationStatistics;
-    private final List<ISimulationTickListener> listeners;
+    private final Map<SimulationEvent, List<ISimulationTickListener>> listeners;
     private final Map<GenomeView, Integer> genomeCount;
     private int dayNumber = 0;
     private double averageLifeSpan = 0;
     private int deadAnimalsCount = 0;
-    private AtomicBoolean simulationPaused;
+    private final AtomicBoolean simulationPaused;
+
+    public enum SimulationEvent {
+        TICK,
+        PAUSE,
+        RESUME,
+        END
+    }
+
 
     public Simulation(AbstractWorldMap worldMap, ModelConfiguration configuration, Statistics simulationStatistics) {
         this.worldMap = worldMap;
         this.configuration = configuration;
         this.simulationStatistics = simulationStatistics;
-        this.listeners = new ArrayList<>();
+        this.listeners = new HashMap<>();
         this.genomeCount = new HashMap<>();
         this.simulationPaused = new AtomicBoolean(false);
 
@@ -61,6 +69,9 @@ public class Simulation implements Runnable {
         try {
             while(!interrupted()) {
                 if(simulationPaused.get()) continue;
+                dayNumber++;
+
+                checkDayCount();
 
                 processRemoveDeadAnimals();
                 processMoveAnimals();
@@ -70,29 +81,51 @@ public class Simulation implements Runnable {
                 processAnimalAging();
 
                 updateStatistics();
-                notifyListeners();
+                notifyListeners(SimulationEvent.TICK);
 
                 Thread.sleep(configuration.getMillisecondsPerSimulationDay());
             }
         } catch(InterruptedException ex){
             System.out.println("Simulation stopped because simulation thread got interrupted!");
         }
+
+        notifyListeners(SimulationEvent.END);
     }
 
-    public void addListener(ISimulationTickListener listener){
-        listeners.add(listener);
+    private void checkDayCount() {
+        if(configuration.getTotalSimulationDays() == Integer.MAX_VALUE)
+            return;
+
+        if(this.dayNumber >= configuration.getTotalSimulationDays())
+            Thread.currentThread().interrupt();
+    }
+
+    public void addListener(SimulationEvent event, ISimulationTickListener listener){
+        if(!listeners.containsKey(event))
+            listeners.put(event, new ArrayList<>());
+
+        listeners.get(event).add(listener);
+    }
+
+    public void removeListener(SimulationEvent event, ISimulationTickListener listener){
+        if(!listeners.containsKey(event))
+            throw new IllegalArgumentException("Given listener is not subscribed");
+
+        listeners.get(event).remove(listener);
     }
 
     public void pause() {
+        notifyListeners(SimulationEvent.PAUSE);
         simulationPaused.set(true);
     }
 
     public void resume() {
+        notifyListeners(SimulationEvent.RESUME);
         simulationPaused.set(false);
     }
 
     private void updateStatistics() {
-        simulationStatistics.getDayNumber().setValue(++dayNumber);
+        simulationStatistics.getDayNumber().setValue(dayNumber);
 
         int mapPositions = worldMap.getMapBoundary().getArea();
         simulationStatistics.getFreePositions().setValue(mapPositions - worldMap.getTakenPositions());
@@ -182,7 +215,8 @@ public class Simulation implements Runnable {
         animalsSet.forEach(Animal::age);
     }
 
-    private void notifyListeners(){
-        listeners.forEach(ISimulationTickListener::onSimulationTick);
+    private void notifyListeners(SimulationEvent event){
+        if(listeners.containsKey(event))
+            listeners.get(event).forEach(ISimulationTickListener::onSimulationTick);
     }
 }

@@ -141,8 +141,6 @@ public class SimulationConfigurationPresenter {
         simulationPresenter.subscribeStatisticsListeners(statistics);
         simulationPresenter.setup(map, configuration.getMapWidth(), configuration.getMapHeight(), simulation);
 
-        simulation.addListener(() -> Platform.runLater(simulationPresenter::drawMap));
-
         return simulation;
     }
 
