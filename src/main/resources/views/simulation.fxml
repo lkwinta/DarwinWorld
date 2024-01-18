@@ -12,12 +12,10 @@
 <?import javafx.scene.control.ToggleButton?>
 <?import javafx.scene.control.Label?>
 <BorderPane minHeight="550.0" minWidth="850.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="agh.ics.oop.presenter.SimulationPresenter">
+            fx:controller="agh.ics.oop.presenter.SimulationPresenter" fx:id="rootBorderPane">
     <top>
         <Label fx:id="simulationStatusLabel" text="Simulation is running" BorderPane.alignment="CENTER" textFill="green" style="-fx-font-size: 15pt"/>
     </top>
-    <bottom>
-    </bottom>
     <center>
         <GridPane fx:id="mapGridPane" alignment="CENTER" gridLinesVisible="true" BorderPane.alignment="CENTER">
             <BorderPane.margin>
@@ -25,11 +23,6 @@
             </BorderPane.margin>
         </GridPane>
     </center>
-    <left>
-        <VBox alignment="CENTER">
-            <fx:include fx:id="statisticsView" source="statisticsWindow.fxml"/>
-        </VBox>
-    </left>
     <bottom>
         <HBox alignment="CENTER" spacing="10.0" BorderPane.alignment="TOP_CENTER">
             <padding>
@@ -51,4 +44,14 @@
             </ToggleButton>
         </HBox>
     </bottom>
+    <left>
+        <VBox alignment="CENTER">
+            <fx:include fx:id="statisticsView" source="statisticsWindow.fxml"/>
+        </VBox>
+    </left>
+    <right>
+        <VBox alignment="CENTER">
+            <fx:include fx:id="animalDetailsView" source="animalDetails.fxml"/>
+        </VBox>
+    </right>
 </BorderPane>

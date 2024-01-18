@@ -3,13 +3,17 @@ package agh.ics.oop.model.world_elements;
 import agh.ics.oop.model.ModelConfiguration;
 import agh.ics.oop.model.world_map.IMoveHandler;
 import agh.ics.oop.model.world_map.MapDirection;
+import javafx.scene.paint.Color;
 import lombok.Getter;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
+import static agh.ics.oop.model.util.MathUtil.clamp;
+import static agh.ics.oop.model.util.MathUtil.getColorGradient;
 import static java.lang.Math.max;
+import static java.lang.Math.min;
 
 public class Animal implements IWorldElement, Comparable<Animal> {
     private Vector2d position;
@@ -87,6 +91,11 @@ public class Animal implements IWorldElement, Comparable<Animal> {
         return Integer.compare(energyLevel, o.energyLevel);
     }
 
+    public double getHealth() {
+        double percent = (double)energyLevel/configuration.getAnimalStartingEnergy();
+        return clamp(percent, 0.0, 1.0);
+    }
+
     public Animal breed(Animal other){
         int side = ThreadLocalRandom.current().nextInt(0, 2);
 
@@ -145,15 +154,21 @@ public class Animal implements IWorldElement, Comparable<Animal> {
 
     @Override
     public String getResourceName() {
-        return switch (orientation) {
-            case NORTH -> "north.png";
-            case SOUTH -> "south.png";
-            case WEST -> "west.png";
-            case NORTH_WEST -> "north_west.png";
-            case NORTH_EAST -> "north_east.png";
-            case EAST -> "east.png";
-            case SOUTH_WEST -> "south_west.png";
-            case SOUTH_EAST -> "south_east.png";
-        };
+//        return switch (orientation) {
+//            case NORTH -> "north.png";
+//            case SOUTH -> "south.png";
+//            case WEST -> "west.png";
+//            case NORTH_WEST -> "north_west.png";
+//            case NORTH_EAST -> "north_east.png";
+//            case EAST -> "east.png";
+//            case SOUTH_WEST -> "south_west.png";
+//            case SOUTH_EAST -> "south_east.png";
+//        };
+        return "owlbear.png";
+    }
+
+    @Override
+    public Color getColor() {
+        return getColorGradient(getHealth(), Color.RED, Color.LIME);
     }
 }

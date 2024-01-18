@@ -11,6 +11,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
@@ -230,9 +231,9 @@ public class SimulationConfigurationPresenter {
     }
 
     /*
-        Not worth refactoring this duplicated code for the sake of readebility and keeping related things together,
-        I don't want to make any connection between app and presenter and i think that creating separate helper class
-        for this pice is not worth it
+        Not worth refactoring this duplicated code for the sake of readability and keeping related things together,
+        I don't want to make any connection between app and presenter and I think that creating separate helper class
+        for this piece is not worth it
     */
     private void configureStage(Stage primaryStage, BorderPane viewRoot) {
         var scene = new Scene(viewRoot);

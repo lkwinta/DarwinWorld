@@ -1,5 +1,7 @@
 package agh.ics.oop.model.world_elements;
 
+import javafx.scene.paint.Color;
+
 public record Grass(Vector2d position) implements IWorldElement {
 
     public boolean isAt(Vector2d position) {
@@ -14,5 +16,10 @@ public record Grass(Vector2d position) implements IWorldElement {
     @Override
     public String getResourceName() {
         return "grass.png";
+    }
+
+    @Override
+    public Color getColor() {
+        return Color.GREEN;
     }
 }

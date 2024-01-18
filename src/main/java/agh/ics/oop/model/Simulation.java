@@ -145,11 +145,13 @@ public class Simulation implements Runnable {
             genomeCount.put(genomeView, genomeCount.get(genomeView) + 1);
         });
 
-        simulationStatistics.getDominateGenome().setValue(
-                genomeCount.entrySet().stream()
-                        .max(Comparator.comparingInt(Map.Entry::getValue))
-                        .map(Map.Entry::getKey)
-                        .orElseThrow());
+        if(!genomeCount.isEmpty())
+            simulationStatistics.getDominateGenome().setValue(
+                    genomeCount.entrySet().stream()
+                            .max(Comparator.comparingInt(Map.Entry::getValue))
+                            .map(Map.Entry::getKey)
+                            .orElseThrow());
+
         simulationStatistics.getAverageChildrenCount().setValue(animalsSet.stream().mapToInt(Animal::getChildrenCount).average().orElse(0.0));
     }
 

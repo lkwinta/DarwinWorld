@@ -1,5 +1,7 @@
 package agh.ics.oop.model.world_elements;
 
+import javafx.scene.paint.Color;
+
 @SuppressWarnings("unused")
 public interface IWorldElement {
     Vector2d position();
@@ -10,4 +12,6 @@ public interface IWorldElement {
     String toString();
 
     String getResourceName();
+
+    Color getColor();
 }

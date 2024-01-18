@@ -2,6 +2,7 @@ package agh.ics.oop.presenter;
 
 import agh.ics.oop.model.Simulation;
 import agh.ics.oop.model.Statistics;
+import agh.ics.oop.model.world_elements.Animal;
 import agh.ics.oop.model.world_elements.IWorldElement;
 import agh.ics.oop.model.world_elements.Vector2d;
 import agh.ics.oop.model.world_map.AbstractWorldMap;
@@ -9,22 +10,20 @@ import agh.ics.oop.model.world_map.Boundary;
 import agh.ics.oop.util.WorldElementBoxFactory;
 
 import javafx.application.Platform;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.geometry.HPos;
-import javafx.scene.Parent;
+import javafx.geometry.Rectangle2D;
+import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.control.ToggleButton;
-import javafx.scene.image.ImageView;
-import javafx.scene.layout.ColumnConstraints;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.RowConstraints;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
+import javafx.stage.Screen;
+
+import static agh.ics.oop.model.util.MathUtil.clamp;
 
 public class SimulationPresenter {
-    private final static int CELL_WIDTH = 20;
-    private final static int CELL_HEIGHT = 20;
+    private int cellSize = 10;
     private final Vector2d xAxisMask = new Vector2d(1, 0);
     private final Vector2d yAxisMask = new Vector2d(0, 1);
     private AbstractWorldMap worldMap;
@@ -37,7 +36,7 @@ public class SimulationPresenter {
     private GridPane mapGridPane;
     /* Kinda hacking approach to divide view, statisticsViewController name is derived automatically by included fx:id*/
     @FXML
-    private Parent statisticsView;
+    private VBox statisticsView;
     @FXML
     private StatisticsWindowPresenter statisticsViewController; // It is assigned from simulationWindow.fxml - file included in simulation.fxml
     @FXML
@@ -46,6 +45,8 @@ public class SimulationPresenter {
     private ToggleButton resumeToggleButton;
     @FXML
     private Label simulationStatusLabel;
+    @FXML
+    private BorderPane rootBorderPane;
 
     private void drawMap() {
         //clear grid
@@ -56,8 +57,11 @@ public class SimulationPresenter {
         createAxes();
 
         for(IWorldElement element : worldMap.getElements()){
-            ImageView elementImageView = WorldElementBoxFactory.getWorldElementBox(element);
+            Node elementImageView = element instanceof Animal animal
+                    ? WorldElementBoxFactory.getAnimalBox(animal, cellSize) :
+                        WorldElementBoxFactory.getWorldElementBox(element, cellSize);
             GridPane.setHalignment(elementImageView, HPos.CENTER);
+
             mapGridPane.add(elementImageView,
                     element.position().x() + 1 - currentBounds.bottomLeft().x(),
                     this.height - (element.position().y() - currentBounds.bottomLeft().y()));
@@ -66,11 +70,11 @@ public class SimulationPresenter {
 
     private void addConstraints() {
         while(mapGridPane.getColumnConstraints().size() <= this.width){
-            mapGridPane.getColumnConstraints().add(new ColumnConstraints(CELL_WIDTH));
+            mapGridPane.getColumnConstraints().add(new ColumnConstraints(cellSize));
         }
 
         while(mapGridPane.getRowConstraints().size() <= this.height){
-            mapGridPane.getRowConstraints().add(new RowConstraints(CELL_HEIGHT));
+            mapGridPane.getRowConstraints().add(new RowConstraints(cellSize));
         }
     }
 
@@ -89,6 +93,7 @@ public class SimulationPresenter {
         int value = start_value;
         for (int i = 1; i <= size; i++){
             Label axis_value = new Label(String.valueOf(value));
+            //axis_value.setMaxSize(cellSize, cellSize);
             GridPane.setHalignment(axis_value, HPos.CENTER);
             mapGridPane.add(axis_value, i * axis_mask.x(), i * axis_mask.y());
             value += step;
@@ -100,6 +105,12 @@ public class SimulationPresenter {
         this.worldMap = worldMap;
         this.width = width;
         this.height = height;
+
+        Rectangle2D screenSize = Screen.getPrimary().getBounds();
+
+        this.cellSize = Math.min(
+                (int)Math.round(clamp(screenSize.getHeight()*0.75/height, 5, 50)),
+                (int)Math.round(clamp(screenSize.getWidth()*0.75/width, 5, 50)));
 
         addConstraints();
         createAxes();

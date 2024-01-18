@@ -19,7 +19,7 @@ public class RandomPositionGenerator implements Iterator<Vector2d>, Iterable<Vec
 
     public RandomPositionGenerator(Vector2d bottomLeft, Vector2d topRight, int maxCount){
         List<Integer> widthRange = new ArrayList<>(IntStream.range(bottomLeft.x(), topRight.x() + 1).boxed().toList());
-        List<Integer> heightRange = new ArrayList<>(IntStream.range(bottomLeft.y(), topRight.x() + 1).boxed().toList());
+        List<Integer> heightRange = new ArrayList<>(IntStream.range(bottomLeft.y(), topRight.y() + 1).boxed().toList());
 
         Collections.shuffle(widthRange);
         Collections.shuffle(heightRange);
