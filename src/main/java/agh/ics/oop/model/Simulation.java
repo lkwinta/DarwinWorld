@@ -8,7 +8,6 @@ import agh.ics.oop.model.world_map.Boundary;
 import agh.ics.oop.model.world_map.EquatorGrassGenerator;
 
 import java.util.*;
-import java.util.concurrent.Semaphore;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -67,11 +66,9 @@ public class Simulation implements Runnable {
         * Handling exception thrown by Thread.sleep(), can't throw exception further because run is overridden function
         * */
         try {
-            while(!interrupted()) {
+            while(simulationShouldRun()) {
                 if(simulationPaused.get()) continue;
                 dayNumber++;
-
-                checkDayCount();
 
                 processRemoveDeadAnimals();
                 processMoveAnimals();
@@ -92,12 +89,14 @@ public class Simulation implements Runnable {
         notifyListeners(SimulationEvent.END);
     }
 
-    private void checkDayCount() {
-        if(configuration.getTotalSimulationDays() == Integer.MAX_VALUE)
-            return;
+    private boolean simulationShouldRun() {
+        if(interrupted() || animalsSet.isEmpty())
+            return false;
 
-        if(this.dayNumber >= configuration.getTotalSimulationDays())
-            Thread.currentThread().interrupt();
+        if(configuration.getTotalSimulationDays() == Integer.MAX_VALUE)
+            return true;
+
+        return this.dayNumber < configuration.getTotalSimulationDays();
     }
 
     public void addListener(SimulationEvent event, ISimulationTickListener listener){
@@ -151,6 +150,7 @@ public class Simulation implements Runnable {
                         .max(Comparator.comparingInt(Map.Entry::getValue))
                         .map(Map.Entry::getKey)
                         .orElseThrow());
+        simulationStatistics.getAverageChildrenCount().setValue(animalsSet.stream().mapToInt(Animal::getChildrenCount).average().orElse(0.0));
     }
 
     private void processRemoveDeadAnimals() {

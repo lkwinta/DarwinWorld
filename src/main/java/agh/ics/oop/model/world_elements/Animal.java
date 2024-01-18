@@ -5,6 +5,8 @@ import agh.ics.oop.model.world_map.IMoveHandler;
 import agh.ics.oop.model.world_map.MapDirection;
 import lombok.Getter;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
 import static java.lang.Math.max;
@@ -19,8 +21,10 @@ public class Animal implements IWorldElement, Comparable<Animal> {
     private final ModelConfiguration configuration;
     @Getter
     private int age;
+    private final List<Animal> children;
 
     public Animal(int initialEnergyLevel, Vector2d initialPosition, ModelConfiguration configuration){
+        this.children = new ArrayList<>();
         this.configuration = configuration;
 
         this.genome = Genome.RandomGenome(this.configuration.getGenomeLength(), this.configuration.getConstructedBehaviour());
@@ -28,6 +32,7 @@ public class Animal implements IWorldElement, Comparable<Animal> {
     }
 
     private Animal(int initialEnergyLevel, Genome initialGenome, Vector2d initialPosition, ModelConfiguration configuration) {
+        this.children = new ArrayList<>();
         this.configuration = configuration;
 
         this.genome = initialGenome;
@@ -92,7 +97,10 @@ public class Animal implements IWorldElement, Comparable<Animal> {
         this.energyLevel -= this.configuration.getAnimalEnergyGivenToChild();
         other.energyLevel -= this.configuration.getAnimalEnergyGivenToChild();
 
-        return new Animal(2*this.configuration.getAnimalEnergyGivenToChild(), newGenome, other.position(), this.configuration);
+        Animal child = new Animal(2*this.configuration.getAnimalEnergyGivenToChild(), newGenome, other.position(), this.configuration);
+        this.children.add(child);
+
+        return child;
     }
 
     private Genome getChildGenome(Animal other, int side, float genesRatio) {
@@ -115,6 +123,10 @@ public class Animal implements IWorldElement, Comparable<Animal> {
 
     public GenomeView getGenomeView() {
         return new GenomeView(genome);
+    }
+
+    public int getChildrenCount() {
+        return children.size();
     }
 
     @Override
