@@ -1,5 +1,6 @@
 package agh.ics.oop.presenter;
 
+import agh.ics.oop.model.Simulation;
 import agh.ics.oop.model.Statistics;
 import agh.ics.oop.model.world_elements.IWorldElement;
 import agh.ics.oop.model.world_elements.Vector2d;
@@ -7,45 +8,51 @@ import agh.ics.oop.model.world_map.AbstractWorldMap;
 import agh.ics.oop.model.world_map.Boundary;
 import agh.ics.oop.util.WorldElementBoxFactory;
 
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.geometry.HPos;
 import javafx.scene.Parent;
 import javafx.scene.control.Label;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.RowConstraints;
 import javafx.scene.layout.VBox;
-import lombok.Setter;
 
 public class SimulationPresenter {
 
-    private final static int CELL_WIDTH = 40;
-    private final static int CELL_HEIGHT = 40;
+    private final static int CELL_WIDTH = 20;
+    private final static int CELL_HEIGHT = 20;
 
     private final Vector2d xAxisMask = new Vector2d(1, 0);
     private final Vector2d yAxisMask = new Vector2d(0, 1);
+
     private AbstractWorldMap worldMap;
     private int width;
     private int height;
 
     @FXML
     private GridPane mapGridPane;
+
+    /* Kinda hacking approach to divide view, statisticsViewController name is derived automatically by included fx:id*/
     @FXML
-    private Label moveInformation;
+    private Parent statisticsView;
     @FXML
-    private StatisticsWindowPresenter statisticsViewController;
+    private StatisticsWindowPresenter statisticsViewController; // It is assigned from simulationWindow.fxml - file included in simulation.fxml
+    private Simulation simulation;
 
     public void drawMap() {
-        clearGrid();
+        //clear grid
+        mapGridPane.getChildren().retainAll(mapGridPane.getChildren().get(0));
 
-        Boundary currentBounds = worldMap.getCurrentBounds();
+        Boundary currentBounds = worldMap.getMapBoundary();
 
         createAxes();
 
         for(IWorldElement element : worldMap.getElements()){
-            VBox elementBox = WorldElementBoxFactory.getWorldElementBox(element);
-            GridPane.setHalignment(elementBox, HPos.CENTER);
-            mapGridPane.add(elementBox,
+            ImageView elementImageView = WorldElementBoxFactory.getWorldElementBox(element);
+            GridPane.setHalignment(elementImageView, HPos.CENTER);
+            mapGridPane.add(elementImageView,
                     element.position().x() + 1 - currentBounds.bottomLeft().x(),
                     this.height - (element.position().y() - currentBounds.bottomLeft().y()));
         }
@@ -62,7 +69,7 @@ public class SimulationPresenter {
     }
 
     private void createAxes() {
-        Boundary currentBounds = worldMap.getCurrentBounds();
+        Boundary currentBounds = worldMap.getMapBoundary();
 
         Label yx = new Label("y/x");
         GridPane.setHalignment(yx, HPos.CENTER);
@@ -82,11 +89,8 @@ public class SimulationPresenter {
         }
     }
 
-    private void clearGrid() {
-        mapGridPane.getChildren().retainAll(mapGridPane.getChildren().get(0)); // hack to retain visible grid lines
-    }
-
-    public void setup(AbstractWorldMap worldMap, int width, int height) {
+    public void setup(AbstractWorldMap worldMap, int width, int height, Simulation simulation) {
+        this.simulation = simulation;
         this.worldMap = worldMap;
         this.width = width;
         this.height = height;
@@ -95,11 +99,17 @@ public class SimulationPresenter {
         createAxes();
     }
 
-    public void setMoveInformationLabel(String text) {
-        moveInformation.setText(text);
-    }
-
     public void subscribeStatisticsListeners(Statistics statistics) {
         statisticsViewController.subscribeStatisticListeners(statistics);
+    }
+
+    @FXML
+    private void onPlayClick(ActionEvent actionEvent) {
+        simulation.resume();
+    }
+
+    @FXML
+    private void onPauseClick(ActionEvent actionEvent) {
+        simulation.pause();
     }
 }

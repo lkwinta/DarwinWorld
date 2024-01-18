@@ -6,6 +6,7 @@ import agh.ics.oop.model.world_elements.Grass;
 import agh.ics.oop.model.world_elements.IWorldElement;
 import agh.ics.oop.model.world_elements.Vector2d;
 import com.google.common.collect.Streams;
+import lombok.Getter;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -18,7 +19,9 @@ public abstract class AbstractWorldMap implements IMoveHandler {
     protected final ConcurrentMap<Vector2d, List<Animal>> animalsMap;
     protected final ConcurrentMap<Vector2d, Grass> grassMap;
     private final List<IMapChangeListener> listeners;
+    @Getter
     private final UUID mapId;
+    @Getter
     private final Boundary mapBoundary;
     protected final int width;
     protected final int height;
@@ -144,19 +147,15 @@ public abstract class AbstractWorldMap implements IMoveHandler {
     }
 
     public String toString() {
-        Boundary currentBounds = getCurrentBounds();
+        Boundary currentBounds = getMapBoundary();
         return mapVisualizer.draw(currentBounds.bottomLeft(), currentBounds.topRight());
-    }
-
-    public Boundary getCurrentBounds() {
-        return mapBoundary;
-    }
-
-    public UUID getId() {
-        return mapId;
     }
 
     public int getGrassCount() {
         return grassMap.size();
+    }
+
+    public int getTakenPositions() {
+        return (int)Streams.concat(animalsMap.keySet().stream(), grassMap.keySet().stream()).distinct().count();
     }
 }

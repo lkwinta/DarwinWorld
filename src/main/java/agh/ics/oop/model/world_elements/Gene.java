@@ -4,7 +4,6 @@ import lombok.ToString;
 
 import java.util.concurrent.ThreadLocalRandom;
 
-@ToString
 public enum Gene {
     ROTATION_0,
     ROTATION_45,
@@ -25,5 +24,10 @@ public enum Gene {
 
     public static Gene getRandom() {
         return values()[ThreadLocalRandom.current().nextInt(0, values().length)];
+    }
+
+    @Override
+    public String toString() {
+        return String.valueOf(ordinal());
     }
 }

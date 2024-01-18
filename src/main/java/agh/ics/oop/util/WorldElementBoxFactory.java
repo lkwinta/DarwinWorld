@@ -12,7 +12,7 @@ import java.util.HashMap;
 public class WorldElementBoxFactory {
     private static final HashMap<String, Image> imagesHashMap = new HashMap<>();
 
-    public static VBox getWorldElementBox(IWorldElement worldElement){
+    public static ImageView getWorldElementBox(IWorldElement worldElement){
         String url = "textures/" + worldElement.getResourceName();
         if(!imagesHashMap.containsKey(url)){
             imagesHashMap.put(url, new Image(url));
@@ -22,13 +22,6 @@ public class WorldElementBoxFactory {
         imageView.setFitHeight(20);
         imageView.setFitWidth(20);
 
-        Label label = new Label(worldElement.position().toString());
-
-        VBox vBox = new VBox();
-        vBox.getChildren().add(imageView);
-        vBox.getChildren().add(label);
-        vBox.setAlignment(Pos.CENTER);
-
-        return vBox;
+        return imageView;
     }
 }

@@ -1,17 +1,26 @@
 package agh.ics.oop.model.world_elements;
 
+import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
-@ToString
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class Genome {
     private final int length;
-    @ToString.Exclude private int activeGene;
+    private int activeGene;
+    @EqualsAndHashCode.Include
     private final List<Gene> genes;
-    @ToString.Exclude private final IGenomeBehaviour genomeBehaviour;
+    private final IGenomeBehaviour genomeBehaviour;
+
+    public Genome(List<Gene> genes, IGenomeBehaviour genomeBehaviour){
+        this.genes = genes;
+        this.length = genes.size();
+        this.activeGene = 0;
+        this.genomeBehaviour = genomeBehaviour;
+    }
 
     private Genome(int length, IGenomeBehaviour genomeBehaviour){
         this.length = length;
@@ -57,10 +66,17 @@ public class Genome {
         }
     }
 
-    public Gene getActiveGene(){
-        Gene gene = genes.get(activeGene);
-
+    public void nextGene(){
         activeGene = genomeBehaviour.shiftGenome(activeGene, length);
-        return gene;
+    }
+
+    public Gene getActiveGene() {
+        return genes.get(activeGene);
+    }
+    @Override
+    public String toString() {
+        return genes.stream()
+                .map(Gene::toString)
+                .reduce("", (acc, gene) -> acc + gene);
     }
 }

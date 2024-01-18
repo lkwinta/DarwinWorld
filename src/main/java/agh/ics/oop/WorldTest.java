@@ -2,7 +2,10 @@ package agh.ics.oop;
 
 import agh.ics.oop.model.Statistics;
 import agh.ics.oop.model.util.ConfigurationManager;
+import agh.ics.oop.model.world_elements.FullPredestinationBehaviour;
 import agh.ics.oop.model.world_elements.Gene;
+import agh.ics.oop.model.world_elements.Genome;
+import agh.ics.oop.model.world_elements.GenomeView;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import lombok.Getter;
@@ -40,14 +43,37 @@ public class WorldTest {
 //
 //    objectProperty.setValue(1);
 
-        Statistics statistics = new Statistics();
-        statistics.getDayNumber().addListener((observable, oldValue, newValue) -> {
-            System.out.println("Old value: " + oldValue);
-            System.out.println("New value: " + newValue);
-        });
-
-        statistics.getDayNumber().setValue(5);
+//        Statistics statistics = new Statistics();
+//        statistics.getDayNumber().addListener((observable, oldValue, newValue) -> {
+//            System.out.println("Old value: " + oldValue);
+//            System.out.println("New value: " + newValue);
+//        });
+//
+//        statistics.getDayNumber().setValue(5);
 
         //simulation.run();
+
+        Genome genome = new Genome(List.of(
+                Gene.ROTATION_0,
+                Gene.ROTATION_90,
+                Gene.ROTATION_180
+        ), new FullPredestinationBehaviour());
+
+        Genome genome1 = new Genome(List.of(
+                Gene.ROTATION_0,
+                Gene.ROTATION_90,
+                Gene.ROTATION_180
+        ), new FullPredestinationBehaviour());
+
+        System.out.println(genome);
+        System.out.println(genome1);
+        System.out.println(genome.equals(genome1));
+
+        GenomeView genomeView = new GenomeView(genome);
+        GenomeView genomeView1 = new GenomeView(genome);
+
+        System.out.println(genomeView);
+        System.out.println(genomeView1);
+        System.out.println(genomeView.equals(genomeView1));
     }
 }

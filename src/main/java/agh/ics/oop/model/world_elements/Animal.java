@@ -13,9 +13,12 @@ public class Animal implements IWorldElement, Comparable<Animal> {
     private Vector2d position;
     @Getter
     private MapDirection orientation;
+    @Getter
     private int energyLevel;
     private final Genome genome;
     private final ModelConfiguration configuration;
+    @Getter
+    private int age;
 
     public Animal(int initialEnergyLevel, Vector2d initialPosition, ModelConfiguration configuration){
         this.configuration = configuration;
@@ -26,6 +29,7 @@ public class Animal implements IWorldElement, Comparable<Animal> {
 
     private Animal(int initialEnergyLevel, Genome initialGenome, Vector2d initialPosition, ModelConfiguration configuration) {
         this.configuration = configuration;
+
         this.genome = initialGenome;
         initializeAnimal(initialEnergyLevel, initialPosition);
     }
@@ -34,6 +38,7 @@ public class Animal implements IWorldElement, Comparable<Animal> {
         this.energyLevel = initialEnergyLevel;
         this.position = initialPosition;
         this.orientation = MapDirection.values()[ThreadLocalRandom.current().nextInt(0, MapDirection.values().length)];
+        this.age = 0;
     }
 
     @Override
@@ -56,7 +61,12 @@ public class Animal implements IWorldElement, Comparable<Animal> {
             orientation = orientation.shift(Gene.ROTATION_180.ordinal());
         }
 
+        this.genome.nextGene();
         this.energyLevel -= this.configuration.getAnimalEnergyLossPerMove();
+    }
+
+    public void age(){
+        this.age++;
     }
 
     public void eat(){
@@ -101,6 +111,10 @@ public class Animal implements IWorldElement, Comparable<Animal> {
 
     public boolean canBreed() {
         return energyLevel > this.configuration.getAnimalReadyToBreedEnergyLevel();
+    }
+
+    public GenomeView getGenomeView() {
+        return new GenomeView(genome);
     }
 
     @Override

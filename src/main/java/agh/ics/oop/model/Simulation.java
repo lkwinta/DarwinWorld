@@ -8,6 +8,8 @@ import agh.ics.oop.model.world_map.Boundary;
 import agh.ics.oop.model.world_map.EquatorGrassGenerator;
 
 import java.util.*;
+import java.util.concurrent.Semaphore;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -19,16 +21,22 @@ public class Simulation implements Runnable {
     private final EquatorGrassGenerator grassGenerator;
     private final ModelConfiguration configuration;
     private final Statistics simulationStatistics;
-    private int dayNumber = 0;
     private final List<ISimulationTickListener> listeners;
+    private final Map<GenomeView, Integer> genomeCount;
+    private int dayNumber = 0;
+    private double averageLifeSpan = 0;
+    private int deadAnimalsCount = 0;
+    private AtomicBoolean simulationPaused;
 
     public Simulation(AbstractWorldMap worldMap, ModelConfiguration configuration, Statistics simulationStatistics) {
         this.worldMap = worldMap;
         this.configuration = configuration;
         this.simulationStatistics = simulationStatistics;
         this.listeners = new ArrayList<>();
+        this.genomeCount = new HashMap<>();
+        this.simulationPaused = new AtomicBoolean(false);
 
-        Boundary mapBounds = worldMap.getCurrentBounds();
+        Boundary mapBounds = worldMap.getMapBoundary();
         RandomPositionGenerator positionGenerator = new RandomPositionGenerator(
                 mapBounds.bottomLeft(),
                 mapBounds.topRight(),
@@ -52,11 +60,14 @@ public class Simulation implements Runnable {
         * */
         try {
             while(!interrupted()) {
+                if(simulationPaused.get()) continue;
+
                 processRemoveDeadAnimals();
                 processMoveAnimals();
                 processAnimalsEating();
                 processAnimalsReproduction();
                 processGrowNewGrass();
+                processAnimalAging();
 
                 updateStatistics();
                 notifyListeners();
@@ -72,10 +83,41 @@ public class Simulation implements Runnable {
         listeners.add(listener);
     }
 
+    public void pause() {
+        simulationPaused.set(true);
+    }
+
+    public void resume() {
+        simulationPaused.set(false);
+    }
+
     private void updateStatistics() {
         simulationStatistics.getDayNumber().setValue(++dayNumber);
-        simulationStatistics.getAnimalCount().setValue(animalsSet.size());
+
+        int mapPositions = worldMap.getMapBoundary().getArea();
+        simulationStatistics.getFreePositions().setValue(mapPositions - worldMap.getTakenPositions());
+        simulationStatistics.getAnimalsCount().setValue(animalsSet.size());
+        simulationStatistics.getDeadAnimalsCount().setValue(deadAnimalsCount);
         simulationStatistics.getGrassCount().setValue(worldMap.getGrassCount());
+        simulationStatistics.getAverageEnergy().setValue(
+                animalsSet.stream()
+                        .mapToInt(Animal::getEnergyLevel)
+                        .average()
+                        .orElse(0));
+        simulationStatistics.getAverageLifeSpan().setValue(averageLifeSpan);
+
+        genomeCount.clear();
+        animalsSet.stream().map(Animal::getGenomeView).forEach((genomeView) -> {
+            if(!genomeCount.containsKey(genomeView))
+                genomeCount.put(genomeView, 0);
+            genomeCount.put(genomeView, genomeCount.get(genomeView) + 1);
+        });
+
+        simulationStatistics.getDominateGenome().setValue(
+                genomeCount.entrySet().stream()
+                        .max(Comparator.comparingInt(Map.Entry::getValue))
+                        .map(Map.Entry::getKey)
+                        .orElseThrow());
     }
 
     private void processRemoveDeadAnimals() {
@@ -85,6 +127,8 @@ public class Simulation implements Runnable {
 
         deadAnimals.forEach(worldMap::remove);
         deadAnimals.forEach(animalsSet::remove);
+        deadAnimals.forEach((animal) ->
+                averageLifeSpan = (deadAnimalsCount*averageLifeSpan + animal.getAge())/(double)++deadAnimalsCount);
     }
 
     private void processMoveAnimals() {
@@ -132,6 +176,10 @@ public class Simulation implements Runnable {
         grassGenerator.stream()
                 .limit(this.configuration.getGrassGrowthPerDay())
                 .forEach(worldMap::place);
+    }
+
+    private void processAnimalAging() {
+        animalsSet.forEach(Animal::age);
     }
 
     private void notifyListeners(){

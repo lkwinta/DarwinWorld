@@ -15,9 +15,19 @@
         <Label fx:id="dayNumberLabel" text="0"/>
     </HBox>
     <HBox spacing="10.0">
+        <Label contentDisplay="RIGHT" text="Free positions: "/>
+        <Pane HBox.hgrow="ALWAYS"/>
+        <Label fx:id="freePositionsLabel" text="0"/>
+    </HBox>
+    <HBox spacing="10.0">
         <Label contentDisplay="RIGHT" text="Animal Count: "/>
         <Pane HBox.hgrow="ALWAYS"/>
         <Label fx:id="animalCountLabel" text="0"/>
+    </HBox>
+    <HBox spacing="10.0">
+        <Label contentDisplay="RIGHT" text="Animal Count: "/>
+        <Pane HBox.hgrow="ALWAYS"/>
+        <Label fx:id="deadAnimalsCount" text="0"/>
     </HBox>
     <HBox spacing="10.0">
         <Label contentDisplay="RIGHT" text="Grass Count: "/>
