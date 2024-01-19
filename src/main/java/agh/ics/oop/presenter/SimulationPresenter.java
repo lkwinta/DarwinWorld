@@ -31,6 +31,7 @@ public class SimulationPresenter {
     private int height;
     private Simulation simulation;
     private boolean simulationEnded = false;
+    private int drawAxes = 0;
 
     @FXML
     private GridPane mapGridPane;
@@ -54,7 +55,8 @@ public class SimulationPresenter {
 
         Boundary currentBounds = worldMap.getMapBoundary();
 
-        createAxes();
+        if(drawAxes > 0)
+            createAxes();
 
         for(IWorldElement element : worldMap.getElements()){
             Node elementImageView = element instanceof Animal animal
@@ -63,17 +65,17 @@ public class SimulationPresenter {
             GridPane.setHalignment(elementImageView, HPos.CENTER);
 
             mapGridPane.add(elementImageView,
-                    element.position().x() + 1 - currentBounds.bottomLeft().x(),
-                    this.height - (element.position().y() - currentBounds.bottomLeft().y()));
+                    element.position().x() - currentBounds.bottomLeft().x() + this.drawAxes,
+                    this.height - (element.position().y() - currentBounds.bottomLeft().y()) - 1 + this.drawAxes);
         }
     }
 
     private void addConstraints() {
-        while(mapGridPane.getColumnConstraints().size() <= this.width){
+        while(mapGridPane.getColumnConstraints().size() < this.width + this.drawAxes){
             mapGridPane.getColumnConstraints().add(new ColumnConstraints(cellSize));
         }
 
-        while(mapGridPane.getRowConstraints().size() <= this.height){
+        while(mapGridPane.getRowConstraints().size() < this.height + this.drawAxes){
             mapGridPane.getRowConstraints().add(new RowConstraints(cellSize));
         }
     }
@@ -112,8 +114,8 @@ public class SimulationPresenter {
                 (int)Math.round(clamp(screenSize.getHeight()*0.75/height, 3, 50)),
                 (int)Math.round(clamp(screenSize.getWidth()*0.75/width, 3, 50)));
 
+        this.drawAxes = (cellSize >= 13 ? 1 : 0);
         addConstraints();
-        createAxes();
 
         simulation.addListener(Simulation.SimulationEvent.TICK, (sim) -> Platform.runLater(this::drawMap));
         simulation.addListener(Simulation.SimulationEvent.PAUSE, (sim) -> Platform.runLater(this::showSimulationPaused));
