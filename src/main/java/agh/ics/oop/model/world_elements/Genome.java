@@ -1,17 +1,26 @@
 package agh.ics.oop.model.world_elements;
 
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
-import java.util.stream.Collectors;
 
-//TODO: Question: is new Genom random?
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class Genome {
     private final int length;
     private int activeGene;
+    @EqualsAndHashCode.Include
     private final List<Gene> genes;
-
     private final IGenomeBehaviour genomeBehaviour;
+
+    public Genome(List<Gene> genes, IGenomeBehaviour genomeBehaviour){
+        this.genes = genes;
+        this.length = genes.size();
+        this.activeGene = 0;
+        this.genomeBehaviour = genomeBehaviour;
+    }
 
     private Genome(int length, IGenomeBehaviour genomeBehaviour){
         this.length = length;
@@ -41,8 +50,11 @@ public class Genome {
         return genome;
     }
 
-    public void mutate() {
-        int mutationsCount = ThreadLocalRandom.current().nextInt(0, length + 1);
+    public void mutate(int minimumMutationsCount, int maximumMutationsCount) {
+        if(maximumMutationsCount - minimumMutationsCount <= 0)
+            return;
+
+        int mutationsCount = ThreadLocalRandom.current().nextInt(minimumMutationsCount, maximumMutationsCount);
         int[] indexes = ThreadLocalRandom.current()
                 .ints(0, length)
                 .distinct()
@@ -54,19 +66,17 @@ public class Genome {
         }
     }
 
-    public Gene getActiveGene(){
-        Gene gene = genes.get(activeGene);
-
+    public void nextGene(){
         activeGene = genomeBehaviour.shiftGenome(activeGene, length);
-        return gene;
     }
 
+    public Gene getActiveGene() {
+        return genes.get(activeGene);
+    }
     @Override
     public String toString() {
-        return "Genome{" +
-                "length=" + length +
-                ", activeGene=" + activeGene +
-                ", genes={" + genes.stream().map(Object::toString).collect(Collectors.joining(", ")) +
-                "}}";
+        return genes.stream()
+                .map(Gene::toString)
+                .reduce("", (acc, gene) -> acc + gene);
     }
 }

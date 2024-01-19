@@ -3,39 +3,55 @@ package agh.ics.oop.model.world_elements;
 import agh.ics.oop.model.ModelConfiguration;
 import agh.ics.oop.model.world_map.IMoveHandler;
 import agh.ics.oop.model.world_map.MapDirection;
+import javafx.scene.paint.Color;
+import lombok.Getter;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
+import static agh.ics.oop.model.util.MathUtil.clamp;
+import static agh.ics.oop.model.util.MathUtil.getColorGradient;
 import static java.lang.Math.max;
-
-//TODO: Question: are new animals spawned with random genome and random orientation ?
+import static java.lang.Math.min;
 
 public class Animal implements IWorldElement, Comparable<Animal> {
     private Vector2d position;
+    @Getter
     private MapDirection orientation;
+    @Getter
     private int energyLevel;
     private final Genome genome;
+    private final ModelConfiguration configuration;
+    @Getter
+    private int age;
+    private final List<Animal> children;
 
-    public Animal(int initialEnergyLevel, Vector2d initialPosition, IGenomeBehaviour genomeBehaviour){
-        this.genome = Genome.RandomGenome(ModelConfiguration.ANIMAL_GENES_LENGTH, genomeBehaviour);
-        System.out.println(genome);
+    public Animal(int initialEnergyLevel, Vector2d initialPosition, ModelConfiguration configuration){
+        this.children = new ArrayList<>();
+        this.configuration = configuration;
+
+        this.genome = Genome.RandomGenome(this.configuration.getGenomeLength(), this.configuration.getConstructedBehaviour());
         initializeAnimal(initialEnergyLevel, initialPosition);
     }
 
-    private Animal(int initialEnergyLevel, Genome initialGenome, Vector2d initialPosition) {
+    private Animal(int initialEnergyLevel, Genome initialGenome, Vector2d initialPosition, ModelConfiguration configuration) {
+        this.children = new ArrayList<>();
+        this.configuration = configuration;
+
         this.genome = initialGenome;
         initializeAnimal(initialEnergyLevel, initialPosition);
-        System.out.println(genome);
     }
 
     private void initializeAnimal(int initialEnergyLevel, Vector2d initialPosition){
         this.energyLevel = initialEnergyLevel;
         this.position = initialPosition;
         this.orientation = MapDirection.values()[ThreadLocalRandom.current().nextInt(0, MapDirection.values().length)];
+        this.age = 0;
     }
 
     @Override
-    public Vector2d getPosition() {
+    public Vector2d position() {
         return position;
     }
 
@@ -54,24 +70,30 @@ public class Animal implements IWorldElement, Comparable<Animal> {
             orientation = orientation.shift(Gene.ROTATION_180.ordinal());
         }
 
-        changeEnergy(-ModelConfiguration.ANIMAL_ENERGY_LOSS_PER_MOVE);
+        this.genome.nextGene();
+        this.energyLevel -= this.configuration.getAnimalEnergyLossPerMove();
     }
 
-    public void changeEnergy(int energyDelta){
-        energyLevel += energyDelta;
+    public void age(){
+        this.age++;
+    }
+
+    public void eat(){
+        energyLevel += this.configuration.getGrassEnergyLevel();
     }
 
     public boolean isAlive() {
         return energyLevel > 0;
     }
 
-    public MapDirection getOrientation() {
-        return orientation;
-    }
-
     @Override
     public int compareTo(Animal o) {
         return Integer.compare(energyLevel, o.energyLevel);
+    }
+
+    public double getHealth() {
+        double percent = (double)energyLevel/configuration.getAnimalStartingEnergy();
+        return clamp(percent, 0.0, 1.0);
     }
 
     public Animal breed(Animal other){
@@ -81,10 +103,13 @@ public class Animal implements IWorldElement, Comparable<Animal> {
 
         Genome newGenome = getChildGenome(other, side, genesRatio);
 
-        this.changeEnergy(-ModelConfiguration.ANIMAL_ENERGY_LOSS_PER_CHILD);
-        other.changeEnergy(-ModelConfiguration.ANIMAL_ENERGY_LOSS_PER_CHILD);
+        this.energyLevel -= this.configuration.getAnimalEnergyGivenToChild();
+        other.energyLevel -= this.configuration.getAnimalEnergyGivenToChild();
 
-        return new Animal(2*ModelConfiguration.ANIMAL_ENERGY_LOSS_PER_CHILD, newGenome, other.getPosition());
+        Animal child = new Animal(2*this.configuration.getAnimalEnergyGivenToChild(), newGenome, other.position(), this.configuration);
+        this.children.add(child);
+
+        return child;
     }
 
     private Genome getChildGenome(Animal other, int side, float genesRatio) {
@@ -97,12 +122,20 @@ public class Animal implements IWorldElement, Comparable<Animal> {
             default -> throw new IllegalStateException("Unexpected value: " + side);
         };
 
-        newGenome.mutate();
+        newGenome.mutate(this.configuration.getMinimalMutationsCount(), this.configuration.getMaximalMutationsCount());
         return newGenome;
     }
 
     public boolean canBreed() {
-        return energyLevel > ModelConfiguration.ANIMAL_READY_TO_BREED_ENERGY;
+        return energyLevel > this.configuration.getAnimalReadyToBreedEnergyLevel();
+    }
+
+    public GenomeView getGenomeView() {
+        return new GenomeView(genome);
+    }
+
+    public int getChildrenCount() {
+        return children.size();
     }
 
     @Override
@@ -121,15 +154,21 @@ public class Animal implements IWorldElement, Comparable<Animal> {
 
     @Override
     public String getResourceName() {
-        return switch (orientation) {
-            case NORTH -> "north.png";
-            case SOUTH -> "south.png";
-            case WEST -> "west.png";
-            case NORTH_WEST -> "north_west.png";
-            case NORTH_EAST -> "north_east.png";
-            case EAST -> "east.png";
-            case SOUTH_WEST -> "south_west.png";
-            case SOUTH_EAST -> "south_east.png";
-        };
+//        return switch (orientation) {
+//            case NORTH -> "north.png";
+//            case SOUTH -> "south.png";
+//            case WEST -> "west.png";
+//            case NORTH_WEST -> "north_west.png";
+//            case NORTH_EAST -> "north_east.png";
+//            case EAST -> "east.png";
+//            case SOUTH_WEST -> "south_west.png";
+//            case SOUTH_EAST -> "south_east.png";
+//        };
+        return "owlbear.png";
+    }
+
+    @Override
+    public Color getColor() {
+        return getColorGradient(getHealth(), Color.RED, Color.LIME);
     }
 }

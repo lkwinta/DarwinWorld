@@ -1,80 +1,129 @@
 package agh.ics.oop.presenter;
 
 import agh.ics.oop.SimulationEngine;
-import agh.ics.oop.model.MoveDirection;
+import agh.ics.oop.model.ModelConfiguration;
 import agh.ics.oop.model.Simulation;
-//import agh.ics.oop.model.util.FileMapDisplay;
-import agh.ics.oop.model.world_elements.FullPredestinationBehaviour;
-import agh.ics.oop.model.world_elements.Vector2d;
+import agh.ics.oop.model.Statistics;
+import agh.ics.oop.model.util.CSVSaver;
+import agh.ics.oop.model.util.ConfigurationManager;
 import agh.ics.oop.model.world_map.AbstractWorldMap;
-import agh.ics.oop.model.world_map.EarthMap;
-import agh.ics.oop.model.world_map.OceanMap;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.Label;
-import javafx.scene.control.ListView;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
-import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
 public class SimulationConfigurationPresenter {
     private final SimulationEngine simulationEngine = new SimulationEngine();
     private final List<Stage> stagesList = new ArrayList<>();
-    private Object propertiesController;
-    private final List<AnimalPropertyEntryPresenter> animalsControllers = new ArrayList<>();
-    
+
     @FXML
-    private TextField argsInput;
+    private ListView<String> configurationsListView;
+
     @FXML
-    private Label informationLabel;
+    private TextField mapWidthTextField;
+
+    @FXML
+    private TextField mapHeightTextField;
+
+    @FXML
+    private TextField startingGrassCountTextField;
+
+    @FXML
+    private TextField grassGrowthPerDayTextField;
+
+    @FXML
+    private TextField grassEnergyLevelTextField;
+
+    @FXML
+    private TextField startingOceanCountTextField;
+
+    @FXML
+    private TextField maxOceanSizeTextField;
+
+    @FXML
+    private TextField oceanChangeRateTextField;
+
+    @FXML
+    private TextField startingAnimalsCount;
+
+    @FXML
+    private TextField animalReadyToBreedEnergyLevelTextField;
+
+    @FXML
+    private TextField animalStartingEnergy;
+
+    @FXML
+    private TextField animalEnergyLossPerMoveTextField;
+
+    @FXML
+    private TextField animalEnergyGivenToChildTextField;
+
+    @FXML
+    private ComboBox<String> genomeBehaviourSelector;
+
+    @FXML
+    private TextField genomeLengthTextField;
+
+    @FXML
+    private TextField minimalMutationsCountTextField;
+
+    @FXML
+    private TextField maximalMutationsCountTextField;
+
+    @FXML
+    private TextField millisecondsPerSimulationDayTextField;
+
+    @FXML
+    private TextField totalSimulationDaysTextField;
+
+    @FXML
+    private TextField configurationNameTextField;
+
     @FXML
     private ComboBox<String> mapSelector;
+
     @FXML
     private Pane propertiesPane;
-    @FXML
-    private ListView<HBox> animalsList;
 
-    private String[] getArgsInput() {
-        return argsInput.getText().split(" ");
-    }
+    @FXML
+    private Label informationLabel;
+
+    @FXML
+    private CheckBox statisticsCSVSaveCheckbox;
+
     @FXML
     private void onSimulationStartClicked() {
         try {
             FXMLLoader fxmlLoader = new FXMLLoader();
+
             fxmlLoader.setLocation(getClass().getClassLoader().getResource("views/simulation.fxml"));
 
             BorderPane viewRoot = fxmlLoader.load();
             Stage stage = new Stage();
             configureStage(stage, viewRoot);
+           
+            SimulationPresenter simulationPresenter = fxmlLoader.getController();
 
-            AbstractWorldMap map = getAbstractWorldMap(fxmlLoader, stage);
+            int id = simulationEngine.runSingleAsync(getSimulation(simulationPresenter));
 
-            informationLabel.setText("Please enter move directions");
-            informationLabel.setTextFill(Color.BLACK);
-
-            Simulation simulation = new Simulation(map, new FullPredestinationBehaviour(), 100);
-
-            simulationEngine.runSingleAsync(simulation);
+            stage.setOnCloseRequest(event -> simulationEngine.interruptSingleSimulation(id));
 
             stagesList.add(stage);
             stage.show();
-        } catch (IllegalArgumentException ex) {
-            System.out.println("Passed illegal argument, please enter correct data: " + ex.getMessage());
-            informationLabel.setText("Passed illegal argument, please enter correct data: " + ex.getMessage());
-            informationLabel.setTextFill(Color.RED);
+        } catch (NumberFormatException ex) {
+            logError("Can't start simulation. Error parsing configuration.");
+            System.out.println("Can't start simulation. Error parsing configuration: " + ex.getMessage());
         }
         catch (IOException ex) {
             /* Crash the application, can't continue without necessary view */
@@ -83,100 +132,112 @@ public class SimulationConfigurationPresenter {
         }
     }
 
-    private AbstractWorldMap getAbstractWorldMap(FXMLLoader fxmlLoader, Stage stage) {
-        SimulationPresenter presenter = fxmlLoader.getController();
+    @NotNull
+    private Simulation getSimulation(SimulationPresenter simulationPresenter) {
+        ModelConfiguration configuration = getCurrentConfiguration();
+        AbstractWorldMap map = configuration.getConstructedMap();
 
-        AbstractWorldMap map;
-        if (mapSelector.getValue().equals("GrassField")) {
-            GrassFieldPropertiesPresenter properties = (GrassFieldPropertiesPresenter) propertiesController;
-            map = new OceanMap(properties.getWidth(), properties.getHeight());
-        }
-        else {
-            RectangularMapPropertiesPresenter properties = (RectangularMapPropertiesPresenter) propertiesController;
-            map = new EarthMap(properties.getWidth(), properties.getHeight());
-        }
+        Statistics statistics = new Statistics();
+        Simulation simulation = new Simulation(map, configuration, statistics);
 
-        presenter.setWorldMap(map);
-        //FileMapDisplay mapDisplay = new FileMapDisplay();
+        if(statisticsCSVSaveCheckbox.isSelected())
+            simulation.addListener(Simulation.SimulationEvent.TICK, new CSVSaver());
 
-        map.addListener((worldMap, message) -> Platform.runLater(presenter::drawMap));
-        map.addListener((worldMap, message) -> Platform.runLater(() -> presenter.setMoveInformationLabel(message)));
-        map.addListener(((worldMap, message) ->
-                System.out.printf("%s %s\n", LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss")), message)));
-        map.addListener((worldMap, message) -> Platform.runLater(stage::sizeToScene));
-       // map.addListener(mapDisplay);
+        simulationPresenter.subscribeStatisticsListeners(statistics);
+        simulationPresenter.setup(map, configuration.getMapWidth(), configuration.getMapHeight(), simulation);
 
-        return map;
+        return simulation;
     }
 
-    private List<Vector2d> getAnimalPositions(){
-        return animalsControllers.stream().map((controller) -> new Vector2d(controller.getXPosition(), controller.getYPosition())).toList();
+    @FXML
+    private void onMapSelected() {
+        setOceanMapSettings();
     }
 
-    public void onApplicationClose() throws InterruptedException {
+    @FXML
+    private void onConfigurationLoadClick() {
+        if(configurationsListView.getSelectionModel().getSelectedItems().isEmpty()) {
+            logError("Please select configuration to load");
+            return;
+        }
+
+        try {
+            String selectedConfiguration = configurationsListView.getSelectionModel().getSelectedItems().get(0);
+            ModelConfiguration modelConfiguration = ConfigurationManager.getConfiguration(selectedConfiguration);
+            setConfigurationFields(modelConfiguration);
+            logInfo("Successfully loaded configuration");
+
+        } catch (Exception ex) {
+            logError("Failed to load configuration");
+            System.out.printf("Failed to load configuration with error: %s\n", ex.getMessage());
+        }
+    }
+
+    @FXML
+    private void onConfigurationSaveClick() {
+        if(configurationNameTextField.getText().isEmpty()) {
+            logError("Please enter configuration name");
+            return;
+        }
+
+        try {
+            ModelConfiguration modelConfiguration = getCurrentConfiguration();
+
+            ConfigurationManager.addConfiguration(configurationNameTextField.getText(), modelConfiguration);
+            configurationsListView.getItems().add(configurationNameTextField.getText());
+
+            ConfigurationManager.saveConfigurationToFiles();
+
+            logInfo("Successfully saved configuration");
+        } catch(NumberFormatException ex) {
+            logError("Please enter correct data");
+        } catch(IllegalArgumentException ex) {
+            logError(ex.getMessage());
+        } catch (IOException ex) {
+            logError("Failed to save configurations");
+            System.out.println("Failed to save configurations with error: " + ex.getMessage());
+        }
+    }
+
+    @FXML
+    private void onConfigurationDeleteClick() {
+        if(configurationsListView.getSelectionModel().getSelectedItems().isEmpty()) {
+            logError("Please select configuration to delete");
+            return;
+        }
+
+        String selectedConfiguration = configurationsListView.getSelectionModel().getSelectedItems().get(0);
+
+        try {
+            ConfigurationManager.removeConfiguration(selectedConfiguration);
+            configurationsListView.getItems().remove(selectedConfiguration);
+
+            ConfigurationManager.saveConfigurationToFiles();
+
+            logInfo("Successfully deleted configuration");
+        } catch(IllegalArgumentException ex) {
+            logError(ex.getMessage());
+        } catch (IOException ex) {
+            logError("Failed to save configurations");
+            System.out.println("Failed to save configurations with error: " + ex.getMessage());
+        }
+    }
+    
+    public void onConfigurationApplicationClose() throws InterruptedException {
         simulationEngine.interruptAllSimulations();
         simulationEngine.awaitAllSimulationsEnd();
 
         stagesList.forEach(Stage::close);
     }
 
-    public void loadPropertiesPane(){
-        FXMLLoader loader = new FXMLLoader();
-
-        try {
-            if (mapSelector.getValue().equals("GrassField"))
-                loader.setLocation(getClass().getClassLoader().getResource("views/grassFieldProperties.fxml"));
-            else
-                loader.setLocation(getClass().getClassLoader().getResource("views/rectangularMapProperties.fxml"));
-
-            VBox rootView = loader.load();
-
-            propertiesPane.getChildren().clear();
-            propertiesPane.getChildren().add(rootView);
-
-            propertiesController = loader.getController();
-        } catch(IOException ex){
-            /* Crash the application, can't continue without necessary view */
-            System.out.println("Can't load fxmlFile" + ex.getMessage());
-            Platform.exit();
-        }
-    }
-
-    @FXML
-    private void onItemSelected() {
-        loadPropertiesPane();
-    }
-
-    @FXML
-    private void onAddAnimalClicked() {
-        FXMLLoader loader = new FXMLLoader();
-        loader.setLocation(getClass().getClassLoader().getResource("views/animalPropertyEntry.fxml"));
-
-        try {
-            HBox root = loader.load();
-            animalsList.getItems().add(root);
-            animalsControllers.add(loader.getController());
-        } catch (IOException ex){
-            /* Crash the application, can't continue without necessary view */
-            System.out.println("Can't load fxmlFile" + ex.getMessage());
-            Platform.exit();
-        }
-    }
-
-    @FXML
-    private void onRemoveAnimalClicked() {
-        int lastIndex = animalsList.getItems().size() - 1;
-
-        if (lastIndex >= 0){
-            animalsList.getItems().remove(lastIndex);
-            animalsControllers.remove(lastIndex);
-        }
+    private void setOceanMapSettings(){
+        propertiesPane.setDisable(mapSelector.getValue().equals("EarthMap"));
     }
 
     /*
-        Not worth refactoring this duplicated code for the sake of readebility and keeping related things together,
-        I don't want to make any connection between app and presenter and i think that creating separate helper class
-        for this pice is not worth it
+        Not worth refactoring this duplicated code for the sake of readability and keeping related things together,
+        I don't want to make any connection between app and presenter and I think that creating separate helper class
+        for this piece is not worth it
     */
     private void configureStage(Stage primaryStage, BorderPane viewRoot) {
         var scene = new Scene(viewRoot);
@@ -184,5 +245,102 @@ public class SimulationConfigurationPresenter {
         primaryStage.setTitle("Simulation");
         primaryStage.minWidthProperty().bind(viewRoot.minWidthProperty());
         primaryStage.minHeightProperty().bind(viewRoot.minHeightProperty());
+    }
+
+    public void loadConfigurations() {
+        try {
+            ConfigurationManager.loadConfigurationsFromFile();
+            configurationsListView.getItems().addAll(ConfigurationManager.getConfigurationNames());
+
+        } catch (Exception ex) {
+            logError("Failed to load configurations");
+            System.out.printf("Failed to load configurations with error: %s\n", ex.getMessage());
+        }
+    }
+
+    private ModelConfiguration getCurrentConfiguration() throws NumberFormatException {
+        ModelConfiguration modelConfiguration = new ModelConfiguration();
+
+        modelConfiguration.setTotalSimulationDays(Integer.parseInt(totalSimulationDaysTextField.getText()));
+        modelConfiguration.setMillisecondsPerSimulationDay(Integer.parseInt(millisecondsPerSimulationDayTextField.getText()));
+
+        if(mapSelector.getValue().equals("EarthMap")) {
+            modelConfiguration.setMapType(ModelConfiguration.MapType.EARTH_MAP);
+        }
+        else {
+            modelConfiguration.setMapType(ModelConfiguration.MapType.OCEAN_MAP);
+
+            modelConfiguration.setStartingOceanCount(Integer.parseInt(startingOceanCountTextField.getText()));
+            modelConfiguration.setMaxOceanSize(Integer.parseInt(maxOceanSizeTextField.getText()));
+            modelConfiguration.setOceanChangeRate(Integer.parseInt(oceanChangeRateTextField.getText()));
+        }
+        modelConfiguration.setMapWidth(Integer.parseInt(mapWidthTextField.getText()));
+        modelConfiguration.setMapHeight(Integer.parseInt(mapHeightTextField.getText()));
+        modelConfiguration.setStartingGrassCount(Integer.parseInt(startingGrassCountTextField.getText()));
+        modelConfiguration.setGrassGrowthPerDay(Integer.parseInt(grassGrowthPerDayTextField.getText()));
+        modelConfiguration.setGrassEnergyLevel(Integer.parseInt(grassEnergyLevelTextField.getText()));
+        modelConfiguration.setStartingAnimalsCount(Integer.parseInt(startingAnimalsCount.getText()));
+        modelConfiguration.setAnimalStartingEnergy(Integer.parseInt(animalStartingEnergy.getText()));
+        modelConfiguration.setAnimalEnergyLossPerMove(Integer.parseInt(animalEnergyLossPerMoveTextField.getText()));
+        modelConfiguration.setAnimalReadyToBreedEnergyLevel(Integer.parseInt(animalReadyToBreedEnergyLevelTextField.getText()));
+        modelConfiguration.setAnimalEnergyGivenToChild(Integer.parseInt(animalEnergyGivenToChildTextField.getText()));
+
+        if(genomeBehaviourSelector.getValue().equals("FullPredestination"))
+            modelConfiguration.setGenomeBehaviour(ModelConfiguration.GenomeBehaviour.FULL_PREDESTINATION);
+        else
+            modelConfiguration.setGenomeBehaviour(ModelConfiguration.GenomeBehaviour.A_BIT_OF_MADNESS);
+
+        modelConfiguration.setGenomeLength(Integer.parseInt(genomeLengthTextField.getText()));
+        modelConfiguration.setMinimalMutationsCount(Integer.parseInt(minimalMutationsCountTextField.getText()));
+        modelConfiguration.setMaximalMutationsCount(Integer.parseInt(maximalMutationsCountTextField.getText()));
+
+        return modelConfiguration;
+    }
+
+    private void setConfigurationFields(ModelConfiguration modelConfiguration) {
+        totalSimulationDaysTextField.setText(String.valueOf(modelConfiguration.getTotalSimulationDays()));
+        millisecondsPerSimulationDayTextField.setText(String.valueOf(modelConfiguration.getMillisecondsPerSimulationDay()));
+
+        if(modelConfiguration.getMapType() == ModelConfiguration.MapType.EARTH_MAP) {
+            mapSelector.setValue("EarthMap");
+        }
+        else {
+            mapSelector.setValue("OceanMap");
+
+            startingOceanCountTextField.setText(String.valueOf(modelConfiguration.getStartingOceanCount()));
+            maxOceanSizeTextField.setText(String.valueOf(modelConfiguration.getMaxOceanSize()));
+            oceanChangeRateTextField.setText(String.valueOf(modelConfiguration.getOceanChangeRate()));
+        }
+        setOceanMapSettings();
+
+        mapWidthTextField.setText(String.valueOf(modelConfiguration.getMapWidth()));
+        mapHeightTextField.setText(String.valueOf(modelConfiguration.getMapHeight()));
+        startingGrassCountTextField.setText(String.valueOf(modelConfiguration.getStartingGrassCount()));
+        grassGrowthPerDayTextField.setText(String.valueOf(modelConfiguration.getGrassGrowthPerDay()));
+        grassEnergyLevelTextField.setText(String.valueOf(modelConfiguration.getGrassEnergyLevel()));
+        startingAnimalsCount.setText(String.valueOf(modelConfiguration.getStartingAnimalsCount()));
+        animalStartingEnergy.setText(String.valueOf(modelConfiguration.getAnimalStartingEnergy()));
+        animalEnergyLossPerMoveTextField.setText(String.valueOf(modelConfiguration.getAnimalEnergyLossPerMove()));
+        animalReadyToBreedEnergyLevelTextField.setText(String.valueOf(modelConfiguration.getAnimalReadyToBreedEnergyLevel()));
+        animalEnergyGivenToChildTextField.setText(String.valueOf(modelConfiguration.getAnimalEnergyGivenToChild()));
+
+        if(modelConfiguration.getGenomeBehaviour() == ModelConfiguration.GenomeBehaviour.FULL_PREDESTINATION)
+            genomeBehaviourSelector.setValue("FullPredestination");
+        else
+            genomeBehaviourSelector.setValue("ABitOfMadness");
+
+        genomeLengthTextField.setText(String.valueOf(modelConfiguration.getGenomeLength()));
+        minimalMutationsCountTextField.setText(String.valueOf(modelConfiguration.getMinimalMutationsCount()));
+        maximalMutationsCountTextField.setText(String.valueOf(modelConfiguration.getMaximalMutationsCount()));
+    }
+
+    private void logError(String message) {
+        informationLabel.setTextFill(Color.RED);
+        informationLabel.setText(message);
+    }
+
+    private void logInfo(String message) {
+        informationLabel.setTextFill(Color.BLACK);
+        informationLabel.setText(message);
     }
 }

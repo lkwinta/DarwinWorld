@@ -21,15 +21,14 @@ public class SimulationApp extends Application {
 
             configureStage(primaryStage, viewRoot);
             SimulationConfigurationPresenter presenter = configurationLoader.getController();
-
-            presenter.loadPropertiesPane();
+            presenter.loadConfigurations();
 
             primaryStage.setOnCloseRequest(event -> {
                 /*
                 we can't throw InterruptedException any further because of lambda, we have to handle it
                  */
                 try {
-                    presenter.onApplicationClose();
+                    presenter.onConfigurationApplicationClose();
                 }
                 catch(InterruptedException ex) {
                     System.out.println("Interrupted exception while closing application");
@@ -37,6 +36,7 @@ public class SimulationApp extends Application {
                 Platform.exit();
             });
 
+            primaryStage.setResizable(false);
             primaryStage.show();
 
         } catch (IOException ex) {

@@ -1,97 +1,167 @@
 package agh.ics.oop.presenter;
 
+import agh.ics.oop.model.Simulation;
+import agh.ics.oop.model.Statistics;
+import agh.ics.oop.model.world_elements.Animal;
 import agh.ics.oop.model.world_elements.IWorldElement;
 import agh.ics.oop.model.world_elements.Vector2d;
+import agh.ics.oop.model.world_map.AbstractWorldMap;
 import agh.ics.oop.model.world_map.Boundary;
-import agh.ics.oop.model.world_map.IWorldMap;
 import agh.ics.oop.util.WorldElementBoxFactory;
 
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.geometry.HPos;
+import javafx.geometry.Rectangle2D;
+import javafx.scene.Node;
 import javafx.scene.control.Label;
-import javafx.scene.layout.ColumnConstraints;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.RowConstraints;
-import javafx.scene.layout.VBox;
+import javafx.scene.control.ToggleButton;
+import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
+import javafx.stage.Screen;
 
-import java.util.Iterator;
-import java.util.List;
+import static agh.ics.oop.model.util.MathUtil.clamp;
 
 public class SimulationPresenter {
-
-    private final static int CELL_WIDTH = 40;
-    private final static int CELL_HEIGHT = 40;
-
+    private int cellSize = 10;
     private final Vector2d xAxisMask = new Vector2d(1, 0);
     private final Vector2d yAxisMask = new Vector2d(0, 1);
-
-    private IWorldMap worldMap;
+    private AbstractWorldMap worldMap;
+    private int width;
+    private int height;
+    private Simulation simulation;
+    private boolean simulationEnded = false;
+    private int drawAxes = 0;
 
     @FXML
     private GridPane mapGridPane;
+    /* Kinda hacking approach to divide view, statisticsViewController name is derived automatically by included fx:id*/
     @FXML
-    private Label moveInformation;
+    private VBox statisticsView;
+    @FXML
+    private StatisticsWindowPresenter statisticsViewController; // It is assigned from simulationWindow.fxml - file included in simulation.fxml
+    @FXML
+    private ToggleButton pauseToggleButton;
+    @FXML
+    private ToggleButton resumeToggleButton;
+    @FXML
+    private Label simulationStatusLabel;
+    @FXML
+    private BorderPane rootBorderPane;
 
-    public void setWorldMap(IWorldMap map){
-        worldMap = map;
-    }
+    private void drawMap() {
+        //clear grid
+        mapGridPane.getChildren().retainAll(mapGridPane.getChildren().get(0));
 
-    public void drawMap() {
-        clearGrid();
+        Boundary currentBounds = worldMap.getMapBoundary();
 
-        Boundary currentBounds = worldMap.getCurrentBounds();
-        int width = currentBounds.topRight().getX() - currentBounds.bottomLeft().getX() + 1;
-        int height = currentBounds.topRight().getY() - currentBounds.bottomLeft().getY() + 1;
-
-        addConstraints(width, height);
-        createAxes(width, height, currentBounds);
+        if(drawAxes > 0)
+            createAxes();
 
         for(IWorldElement element : worldMap.getElements()){
-            VBox elementBox = WorldElementBoxFactory.getWorldElementBox(element);
-            GridPane.setHalignment(elementBox, HPos.CENTER);
-            mapGridPane.add(elementBox,
-                    element.getPosition().getX() + 1 - currentBounds.bottomLeft().getX(),
-                    height - (element.getPosition().getY() - currentBounds.bottomLeft().getY()));
+            Node elementImageView = element instanceof Animal animal
+                    ? WorldElementBoxFactory.getAnimalBox(animal, cellSize) :
+                        WorldElementBoxFactory.getWorldElementBox(element, cellSize);
+            GridPane.setHalignment(elementImageView, HPos.CENTER);
+
+            mapGridPane.add(elementImageView,
+                    element.position().x() - currentBounds.bottomLeft().x() + this.drawAxes,
+                    this.height - (element.position().y() - currentBounds.bottomLeft().y()) - 1 + this.drawAxes);
         }
     }
 
-    private void addConstraints(int width, int height) {
-        while(mapGridPane.getColumnConstraints().size() <= width){
-            mapGridPane.getColumnConstraints().add(new ColumnConstraints(CELL_WIDTH));
+    private void addConstraints() {
+        while(mapGridPane.getColumnConstraints().size() < this.width + this.drawAxes){
+            mapGridPane.getColumnConstraints().add(new ColumnConstraints(cellSize));
         }
 
-        while(mapGridPane.getRowConstraints().size() <= height){
-            mapGridPane.getRowConstraints().add(new RowConstraints(CELL_HEIGHT));
+        while(mapGridPane.getRowConstraints().size() < this.height + this.drawAxes){
+            mapGridPane.getRowConstraints().add(new RowConstraints(cellSize));
         }
     }
 
-    private void createAxes(int width, int height, Boundary currentBounds) {
+    private void createAxes() {
+        Boundary currentBounds = worldMap.getMapBoundary();
+
         Label yx = new Label("y/x");
         GridPane.setHalignment(yx, HPos.CENTER);
         mapGridPane.add(yx, 0, 0);
 
-        createAxis(width, currentBounds.bottomLeft().getX(), 1, xAxisMask);
-        createAxis(height, currentBounds.topRight().getY(), -1, yAxisMask);
+        createAxis(this.width, currentBounds.bottomLeft().x(), 1, xAxisMask);
+        createAxis(this.height, currentBounds.topRight().y(), -1, yAxisMask);
     }
 
     private void createAxis(int size, int start_value, int step, Vector2d axis_mask) {
         int value = start_value;
         for (int i = 1; i <= size; i++){
             Label axis_value = new Label(String.valueOf(value));
+            //axis_value.setMaxSize(cellSize, cellSize);
             GridPane.setHalignment(axis_value, HPos.CENTER);
-            mapGridPane.add(axis_value, i * axis_mask.getX(), i * axis_mask.getY());
+            mapGridPane.add(axis_value, i * axis_mask.x(), i * axis_mask.y());
             value += step;
         }
     }
 
-    public void setMoveInformationLabel(String text) {
-        moveInformation.setText(text);
+    public void setup(AbstractWorldMap worldMap, int width, int height, Simulation simulation) {
+        this.simulation = simulation;
+        this.worldMap = worldMap;
+        this.width = width;
+        this.height = height;
+
+        Rectangle2D screenSize = Screen.getPrimary().getBounds();
+
+        this.cellSize = Math.min(
+                (int)Math.round(clamp(screenSize.getHeight()*0.75/height, 3, 50)),
+                (int)Math.round(clamp(screenSize.getWidth()*0.75/width, 3, 50)));
+
+        this.drawAxes = (cellSize >= 13 ? 1 : 0);
+        addConstraints();
+
+        simulation.addListener(Simulation.SimulationEvent.TICK, (sim) -> Platform.runLater(this::drawMap));
+        simulation.addListener(Simulation.SimulationEvent.PAUSE, (sim) -> Platform.runLater(this::showSimulationPaused));
+        simulation.addListener(Simulation.SimulationEvent.RESUME, (sim) -> Platform.runLater(this::showSimulationResumed));
+        simulation.addListener(Simulation.SimulationEvent.END, (sim) -> Platform.runLater(this::showSimulationEnded));
     }
 
-    private void clearGrid() {
-        mapGridPane.getChildren().retainAll(mapGridPane.getChildren().get(0)); // hack to retain visible grid lines
-        mapGridPane.getColumnConstraints().clear();
-        mapGridPane.getRowConstraints().clear();
+    private void showSimulationEnded() {
+        simulationStatusLabel.setText("Simulation has ended");
+        simulationStatusLabel.setTextFill(Color.RED);
+        simulationEnded = true;
     }
 
+    private void showSimulationResumed() {
+        if(simulationEnded)
+            return;
+
+        simulationStatusLabel.setText("Simulation is running");
+        simulationStatusLabel.setTextFill(Color.GREEN);
+    }
+
+    private void showSimulationPaused() {
+        if(simulationEnded)
+            return;
+
+        simulationStatusLabel.setText("Simulation has been paused");
+        simulationStatusLabel.setTextFill(Color.ORANGE);
+    }
+
+    public void subscribeStatisticsListeners(Statistics statistics) {
+        statisticsViewController.subscribeStatisticListeners(statistics);
+    }
+
+    @FXML
+    private void onPlayClick() {
+        resumeToggleButton.setSelected(true);
+        pauseToggleButton.setSelected(false);
+
+        simulation.resume();
+    }
+
+    @FXML
+    private void onPauseClick() {
+        resumeToggleButton.setSelected(false);
+        pauseToggleButton.setSelected(true);
+
+        simulation.pause();
+    }
 }

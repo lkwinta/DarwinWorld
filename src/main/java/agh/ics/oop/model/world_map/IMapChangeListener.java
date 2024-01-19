@@ -1,7 +1,6 @@
 package agh.ics.oop.model.world_map;
 
-import agh.ics.oop.model.world_map.IWorldMap;
-
+@FunctionalInterface
 public interface IMapChangeListener {
-    void mapChanged(IWorldMap worldMap, String message);
+    void mapChanged(AbstractWorldMap worldMap, String message);
 }

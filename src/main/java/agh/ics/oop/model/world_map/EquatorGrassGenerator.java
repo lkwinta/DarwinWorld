@@ -3,11 +3,11 @@ package agh.ics.oop.model.world_map;
 import agh.ics.oop.model.world_elements.Grass;
 import agh.ics.oop.model.world_elements.Vector2d;
 import com.google.common.collect.Streams;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
 
 public class EquatorGrassGenerator implements Iterator<Grass>, Iterable<Grass> {
     private final int equatorYCoordinate;
@@ -17,7 +17,7 @@ public class EquatorGrassGenerator implements Iterator<Grass>, Iterable<Grass> {
 
     public EquatorGrassGenerator(int width, int height){
         this.equatorYCoordinate = height / 2;
-        this.equatorHeight = (int)Math.ceil(0.1*height);
+        this.equatorHeight = (int)Math.round(0.1*height);
 
         this.freeOtherPositions = new HashSet<>(width*height - 2*equatorHeight*width);
         this.freeEquatorPositions = new HashSet<>(2*equatorHeight*width);
@@ -27,9 +27,6 @@ public class EquatorGrassGenerator implements Iterator<Grass>, Iterable<Grass> {
                  addFreePosition(new Vector2d(x, y));
             }
         }
-
-        System.out.println(freeOtherPositions.size());
-        System.out.println(freeEquatorPositions.size());
     }
 
     public void addFreePosition(Vector2d position) {
@@ -40,10 +37,11 @@ public class EquatorGrassGenerator implements Iterator<Grass>, Iterable<Grass> {
     }
 
     private boolean isPositionInEquator(Vector2d position){
-        return position.getY() > equatorYCoordinate - equatorHeight && position.getY() < equatorYCoordinate + equatorHeight;
+        return position.y() >= equatorYCoordinate - equatorHeight && position.y() < equatorYCoordinate + equatorHeight;
     }
 
     @Override
+    @NotNull
     public Iterator<Grass> iterator() {
         return this;
     }

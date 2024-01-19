@@ -1,6 +1,8 @@
 package agh.ics.oop.model.world_elements;
 
-import java.util.Random;
+import lombok.ToString;
+
+import java.util.concurrent.ThreadLocalRandom;
 
 public enum Gene {
     ROTATION_0,
@@ -11,23 +13,21 @@ public enum Gene {
     ROTATION_225,
     ROTATION_270,
     ROTATION_315;
-    private static final Random random = new Random();
+
     public Gene getNewRandom(){
-        int index = random.nextInt(0, values().length);
+        int index = ThreadLocalRandom.current().nextInt(0, values().length);
         while(index == this.ordinal())
-            index = random.nextInt(0, values().length);
+            index = ThreadLocalRandom.current().nextInt(0, values().length);
 
         return values()[index];
     }
 
     public static Gene getRandom() {
-        return values()[random.nextInt(0, values().length)];
+        return values()[ThreadLocalRandom.current().nextInt(0, values().length)];
     }
 
     @Override
     public String toString() {
-        return "Gene{" +
-                "name=" + this.name() +
-                '}';
+        return String.valueOf(ordinal());
     }
 }

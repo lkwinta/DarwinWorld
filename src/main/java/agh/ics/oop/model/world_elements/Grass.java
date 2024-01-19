@@ -1,27 +1,25 @@
 package agh.ics.oop.model.world_elements;
 
-public class Grass implements IWorldElement {
-    private final Vector2d position;
+import javafx.scene.paint.Color;
 
-    public Grass(Vector2d position){
-        this.position = position;
-    }
+public record Grass(Vector2d position) implements IWorldElement {
 
-    public Vector2d getPosition() {
-        return position;
-    }
-
-    public boolean isAt(Vector2d position){
+    public boolean isAt(Vector2d position) {
         return this.position.equals(position);
     }
 
     @Override
-    public String toString(){
+    public String toString() {
         return "*";
     }
 
     @Override
     public String getResourceName() {
         return "grass.png";
+    }
+
+    @Override
+    public Color getColor() {
+        return Color.GREEN;
     }
 }
