@@ -73,6 +73,11 @@ public class Genome {
     public Gene getActiveGene() {
         return genes.get(activeGene);
     }
+
+    public int getActiveGeneIndex() {
+        return activeGene;
+    }
+
     @Override
     public String toString() {
         return genes.stream()

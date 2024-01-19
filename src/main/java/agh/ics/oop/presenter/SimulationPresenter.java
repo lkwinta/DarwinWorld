@@ -14,11 +14,15 @@ import javafx.fxml.FXML;
 import javafx.geometry.HPos;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Node;
+import javafx.scene.Parent;
 import javafx.scene.control.Label;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.stage.Screen;
+
+import java.util.List;
+import java.util.Optional;
 
 import static agh.ics.oop.model.util.MathUtil.clamp;
 
@@ -35,19 +39,22 @@ public class SimulationPresenter {
 
     @FXML
     private GridPane mapGridPane;
-    /* Kinda hacking approach to divide view, statisticsViewController name is derived automatically by included fx:id*/
+    /* Kinda hacky approach to divide view, statisticsViewController name is derived automatically by included fx:id*/
     @FXML
-    private VBox statisticsView;
+    private Parent statisticsView;
     @FXML
     private StatisticsWindowPresenter statisticsViewController; // It is assigned from simulationWindow.fxml - file included in simulation.fxml
+    /* Kinda hacky approach to divide view, statisticsViewController name is derived automatically by included fx:id*/
+    @FXML
+    private Parent animalDetailsView;
+    @FXML
+    private AnimalDetailsPresenter animalDetailsViewController; // It is assigned from simulationWindow.fxml - file included in simulation.fxml
     @FXML
     private ToggleButton pauseToggleButton;
     @FXML
     private ToggleButton resumeToggleButton;
     @FXML
     private Label simulationStatusLabel;
-    @FXML
-    private BorderPane rootBorderPane;
 
     private void drawMap() {
         //clear grid
@@ -59,15 +66,34 @@ public class SimulationPresenter {
             createAxes();
 
         for(IWorldElement element : worldMap.getElements()){
-            Node elementImageView = element instanceof Animal animal
-                    ? WorldElementBoxFactory.getAnimalBox(animal, cellSize) :
-                        WorldElementBoxFactory.getWorldElementBox(element, cellSize);
+            Node elementImageView;
+
+            if(element instanceof Animal animal) {
+                elementImageView = WorldElementBoxFactory.getAnimalBox(animal, cellSize);
+                elementImageView.setOnMouseClicked((event) -> onElementClick(new Vector2d(element.getPosition().x(), element.getPosition().y())));
+                elementImageView.setStyle("-fx-cursor: hand;");
+            } else {
+                elementImageView = WorldElementBoxFactory.getWorldElementBox(element, cellSize);
+            }
+
             GridPane.setHalignment(elementImageView, HPos.CENTER);
 
             mapGridPane.add(elementImageView,
-                    element.position().x() - currentBounds.bottomLeft().x() + this.drawAxes,
-                    this.height - (element.position().y() - currentBounds.bottomLeft().y()) - 1 + this.drawAxes);
+                    element.getPosition().x() - currentBounds.bottomLeft().x() + this.drawAxes,
+                    this.height - (element.getPosition().y() - currentBounds.bottomLeft().y()) - 1 + this.drawAxes);
         }
+    }
+
+    private void onElementClick(Vector2d position) {
+        Optional<List<Animal>> animals = worldMap.getAnimalsAt(position);
+        if(animals.isPresent()){
+            animalDetailsViewController.listAnimals(animals.get());
+            animalDetailsViewController.setTrackedAnimal(animals.get().get(0));
+
+        } else {
+            animalDetailsViewController.listAnimals(List.of());
+        }
+
     }
 
     private void addConstraints() {
@@ -108,6 +134,7 @@ public class SimulationPresenter {
         this.width = width;
         this.height = height;
 
+
         Rectangle2D screenSize = Screen.getPrimary().getBounds();
 
         this.cellSize = Math.min(
@@ -115,12 +142,14 @@ public class SimulationPresenter {
                 (int)Math.round(clamp(screenSize.getWidth()*0.75/width, 3, 50)));
 
         this.drawAxes = (cellSize >= 13 ? 1 : 0);
+
         addConstraints();
 
         simulation.addListener(Simulation.SimulationEvent.TICK, (sim) -> Platform.runLater(this::drawMap));
         simulation.addListener(Simulation.SimulationEvent.PAUSE, (sim) -> Platform.runLater(this::showSimulationPaused));
         simulation.addListener(Simulation.SimulationEvent.RESUME, (sim) -> Platform.runLater(this::showSimulationResumed));
         simulation.addListener(Simulation.SimulationEvent.END, (sim) -> Platform.runLater(this::showSimulationEnded));
+        simulation.addListener(Simulation.SimulationEvent.TICK, (sim) -> Platform.runLater(animalDetailsViewController::updateHandler));
     }
 
     private void showSimulationEnded() {

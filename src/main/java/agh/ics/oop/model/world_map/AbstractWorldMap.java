@@ -69,21 +69,21 @@ public abstract class AbstractWorldMap implements IMoveHandler {
 
     public void place(IWorldElement object) {
         if(object instanceof Animal animal) {
-            addToHashMap(animalsMap, animal.position(), animal);
-            mapChanged("Animal placed at: " + animal.position());
+            addToHashMap(animalsMap, animal.getPosition(), animal);
+            mapChanged("Animal placed at: " + animal.getPosition());
         } else if (object instanceof Grass grass) {
-            grassMap.put(grass.position(), grass);
-            mapChanged("Grass placed at: " + grass.position());
+            grassMap.put(grass.getPosition(), grass);
+            mapChanged("Grass placed at: " + grass.getPosition());
         }
     }
 
     public void remove(IWorldElement object) {
         if(object instanceof Animal animal) {
-            removeFromHashMap(animalsMap, animal.position(), animal);
-            mapChanged("Animal removed from: " + animal.position());
+            removeFromHashMap(animalsMap, animal.getPosition(), animal);
+            mapChanged("Animal removed from: " + animal.getPosition());
         } else if (object instanceof Grass grass) {
-            grassMap.remove(grass.position());
-            mapChanged("Grass removed from: " + grass.position());
+            grassMap.remove(grass.getPosition());
+            mapChanged("Grass removed from: " + grass.getPosition());
         }
     }
 
@@ -91,28 +91,28 @@ public abstract class AbstractWorldMap implements IMoveHandler {
         if(!(object instanceof Animal animal))
             throw new IllegalArgumentException("You can't move object that is not an Animal'");
 
-        Vector2d oldPosition = animal.position();
+        Vector2d oldPosition = animal.getPosition();
 
         animal.move( this);
 
-        if(!animal.position().equals(oldPosition)){
+        if(!animal.getPosition().equals(oldPosition)){
             removeFromHashMap(animalsMap, oldPosition, animal);
-            addToHashMap(animalsMap, animal.position(), animal);
+            addToHashMap(animalsMap, animal.getPosition(), animal);
             mapChanged("Animal at %s moved to: %s with orientation: %s".formatted(
                     oldPosition,
-                    animal.position(),
+                    animal.getPosition(),
                     animal.getOrientation()
             ));
         }
         else
-            mapChanged("Cannot move animal at: %s".formatted(animal.position()));
+            mapChanged("Cannot move animal at: %s".formatted(animal.getPosition()));
     }
 
     public boolean isOccupied(Vector2d position) {
         return objectsAt(position).isPresent();
     }
 
-    public Optional<List<Animal>> getTopAnimalsAt(Vector2d position) {
+    public Optional<List<Animal>> getAnimalsAt(Vector2d position) {
         if(!animalsMap.containsKey(position))
             return Optional.empty();
 

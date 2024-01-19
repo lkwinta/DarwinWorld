@@ -1,16 +1,52 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.*?>
-<?import java.util.*?>
-<?import javafx.scene.*?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
-
 <?import javafx.geometry.Insets?>
-<VBox xmlns="http://javafx.com/javafx"
-      xmlns:fx="http://javafx.com/fxml"
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.TextFlow?>
+
+<VBox spacing="5.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
       fx:controller="agh.ics.oop.presenter.AnimalDetailsPresenter">
-    <Label text="Animal details:"/>
+    <Label text="Animal selection:"/>
+    <Label text="To select animal for tracking please pause the simulation!"/>
+    <ListView fx:id="animalDetailsListView"/>
+    <Label text="Tracked animal details:"/>
+    <VBox spacing="5.0">
+        <HBox spacing="5.0">
+            <Label text="Genome:"/>
+            <TextFlow fx:id="genomeTextFlow"/>
+        </HBox>
+        <HBox spacing="5.0">
+            <Label text="Current energy:"/>
+            <Label fx:id="currentEnergy" text="0"/>
+        </HBox>
+        <HBox spacing="5.0">
+            <Label text="Grass eaten:"/>
+            <Label fx:id="grassEatenLabel" text="0"/>
+        </HBox>
+        <HBox spacing="5.0">
+            <Label text="Child count:"/>
+            <Label fx:id="childCountLabel" text="0"/>
+        </HBox>
+        <HBox spacing="5.0">
+            <Label text="Descendants count:"/>
+            <Label fx:id="descendantsCountLabel" text="0"/>
+        </HBox>
+        <HBox spacing="5.0">
+            <Label text="Is alive:"/>
+            <Label fx:id="isAliveLabel" text="0"/>
+        </HBox>
+        <HBox spacing="5.0" fx:id="aliveHBox">
+            <Label text="Age:"/>
+            <Label fx:id="ageLabel" text="0"/>
+        </HBox>
+        <HBox spacing="5.0" fx:id="diedHBox">
+            <Label text="Died at day:"/>
+            <Label fx:id="diedAtLabel" text="0"/>
+        </HBox>
+    </VBox>
     <padding>
         <Insets bottom="5.0" left="20.0" right="5.0" top="5.0"/>
     </padding>

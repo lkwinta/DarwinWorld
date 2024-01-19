@@ -5,9 +5,9 @@ import agh.ics.oop.model.world_map.IMoveHandler;
 import agh.ics.oop.model.world_map.MapDirection;
 import javafx.scene.paint.Color;
 import lombok.Getter;
+import lombok.Setter;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 
 import static agh.ics.oop.model.util.MathUtil.clamp;
@@ -16,6 +16,7 @@ import static java.lang.Math.max;
 import static java.lang.Math.min;
 
 public class Animal implements IWorldElement, Comparable<Animal> {
+    @Getter
     private Vector2d position;
     @Getter
     private MapDirection orientation;
@@ -26,6 +27,11 @@ public class Animal implements IWorldElement, Comparable<Animal> {
     @Getter
     private int age;
     private final List<Animal> children;
+    @Getter
+    private int grassEaten = 0;
+    @Getter
+    @Setter
+    private int diedAt = -1;
 
     public Animal(int initialEnergyLevel, Vector2d initialPosition, ModelConfiguration configuration){
         this.children = new ArrayList<>();
@@ -48,11 +54,6 @@ public class Animal implements IWorldElement, Comparable<Animal> {
         this.position = initialPosition;
         this.orientation = MapDirection.values()[ThreadLocalRandom.current().nextInt(0, MapDirection.values().length)];
         this.age = 0;
-    }
-
-    @Override
-    public Vector2d position() {
-        return position;
     }
 
     @Override
@@ -80,6 +81,7 @@ public class Animal implements IWorldElement, Comparable<Animal> {
 
     public void eat(){
         energyLevel += this.configuration.getGrassEnergyLevel();
+        grassEaten++;
     }
 
     public boolean isAlive() {
@@ -106,7 +108,7 @@ public class Animal implements IWorldElement, Comparable<Animal> {
         this.energyLevel -= this.configuration.getAnimalEnergyGivenToChild();
         other.energyLevel -= this.configuration.getAnimalEnergyGivenToChild();
 
-        Animal child = new Animal(2*this.configuration.getAnimalEnergyGivenToChild(), newGenome, other.position(), this.configuration);
+        Animal child = new Animal(2*this.configuration.getAnimalEnergyGivenToChild(), newGenome, other.getPosition(), this.configuration);
         this.children.add(child);
 
         return child;
@@ -170,5 +172,28 @@ public class Animal implements IWorldElement, Comparable<Animal> {
     @Override
     public Color getColor() {
         return getColorGradient(getHealth(), Color.RED, Color.LIME);
+    }
+
+    public int getDescendantsCount() {
+        Animal current = this;
+        int descendantsCount = 0;
+        Stack<Animal> animals = new Stack<>();
+        Set<Animal> counted = new HashSet<>();
+
+        animals.push(current);
+
+        while(!animals.isEmpty()){
+            current = animals.pop();
+            counted.add(current);
+
+            for(Animal child : current.children){
+                if(!counted.contains(child)){
+                    animals.push(child);
+                    descendantsCount++;
+                }
+            }
+        }
+
+        return descendantsCount;
     }
 }
