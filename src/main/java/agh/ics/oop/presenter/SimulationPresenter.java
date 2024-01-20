@@ -7,9 +7,11 @@ import agh.ics.oop.model.world_elements.IWorldElement;
 import agh.ics.oop.model.world_elements.Vector2d;
 import agh.ics.oop.model.world_map.AbstractWorldMap;
 import agh.ics.oop.model.world_map.Boundary;
-import agh.ics.oop.util.WorldElementBoxFactory;
+import agh.ics.oop.presenter.util.WorldElementBoxFactory;
 
 import javafx.application.Platform;
+import javafx.collections.ObservableList;
+import javafx.css.StyleClass;
 import javafx.fxml.FXML;
 import javafx.geometry.HPos;
 import javafx.geometry.Rectangle2D;
@@ -20,9 +22,6 @@ import javafx.scene.control.ToggleButton;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.stage.Screen;
-
-import java.util.List;
-import java.util.Optional;
 
 import static agh.ics.oop.model.util.MathUtil.clamp;
 
@@ -55,6 +54,7 @@ public class SimulationPresenter {
     private ToggleButton resumeToggleButton;
     @FXML
     private Label simulationStatusLabel;
+    private boolean animalsClickable = false;
 
     @FXML
     private void onPlayClick() {
@@ -85,12 +85,12 @@ public class SimulationPresenter {
             Node elementImageView;
 
             if(element instanceof Animal animal) {
-                elementImageView = WorldElementBoxFactory.getAnimalBox(animal, cellSize);
+                elementImageView = WorldElementBoxFactory.getAnimalBox(
+                        animal,
+                        cellSize,
+                        element == animalDetailsViewController.getTrackedAnimal()
+                );
                 elementImageView.setOnMouseClicked((event) -> onElementClick(new Vector2d(element.getPosition().x(), element.getPosition().y())));
-                elementImageView.setStyle("-fx-cursor: hand;");
-                if(element == animalDetailsViewController.getTrackedAnimal()) {
-                    elementImageView.setStyle("-fx-effect: dropshadow( three-pass-box, rgba(83, 34, 117, 0.8) , 7, 0.5 , 0 , 0); -fx-background-color: #caa2fa");
-                }
             } else {
                 elementImageView = WorldElementBoxFactory.getWorldElementBox(element, cellSize);
             }
@@ -104,6 +104,9 @@ public class SimulationPresenter {
     }
 
     private void onElementClick(Vector2d position) {
+        if(!animalsClickable)
+            return;
+
         worldMap.getAnimalsAt(position).ifPresent(animalDetailsViewController::listAnimals);
     }
 
@@ -163,6 +166,24 @@ public class SimulationPresenter {
         simulation.addListener(Simulation.SimulationEvent.TICK, (sim) -> Platform.runLater(animalDetailsViewController::updateHandler));
         simulation.addListener(Simulation.SimulationEvent.PAUSE, (sim) -> Platform.runLater(animalDetailsViewController::enableTrackingChange));
         simulation.addListener(Simulation.SimulationEvent.RESUME, (sim) -> Platform.runLater(animalDetailsViewController::disableTrackingChange));
+
+        simulation.addListener(Simulation.SimulationEvent.PAUSE, (sim) -> Platform.runLater(this::enableAnimalsSelection));
+        simulation.addListener(Simulation.SimulationEvent.RESUME, (sim) -> Platform.runLater(this::disableAnimalsSelection));
+    }
+
+    private void enableAnimalsSelection() {
+        this.mapGridPane.getChildren().stream()
+                .filter(node -> node.getStyleClass().contains("animal-node"))
+                .forEach(node -> node.getStyleClass().add("selectable-animal"));
+        this.animalsClickable = true;
+    }
+
+    private void disableAnimalsSelection() {
+        this.mapGridPane.getChildren().stream()
+                .filter(node -> node.getStyleClass().contains("animal-node"))
+                .forEach(node -> node.getStyleClass().remove("selectable-animal"));
+
+        this.animalsClickable = false;
     }
 
     private void showSimulationEnded() {

@@ -1,6 +1,6 @@
 package agh.ics.oop.model.util;
 
-import agh.ics.oop.ISimulationEventListener;
+import agh.ics.oop.model.ISimulationEventListener;
 import agh.ics.oop.model.Simulation;
 
 import java.io.File;

@@ -1,20 +1,14 @@
 package agh.ics.oop.presenter;
 
 import agh.ics.oop.model.world_elements.Animal;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.layout.HBox;
 import javafx.scene.text.Text;
-import javafx.scene.text.TextFlow;
 import lombok.Getter;
 
-import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
 
 public class AnimalDetailsPresenter {
     @FXML
@@ -23,8 +17,6 @@ public class AnimalDetailsPresenter {
     private Label positionLabel;
     @FXML
     private HBox diedHBox;
-    @FXML
-    private TextFlow genomeTextFlow;
     @FXML
     private Label currentEnergy;
     @FXML
@@ -39,6 +31,9 @@ public class AnimalDetailsPresenter {
     private Label diedAtLabel;
     @FXML
     private ListView<Animal> animalDetailsListView;
+    @FXML
+    private ListView<Text> genotypeListView;
+
     @Getter
     private Animal trackedAnimal = null;
     private int previousIndex;
@@ -61,16 +56,15 @@ public class AnimalDetailsPresenter {
     public void setTrackedAnimal(Animal animal) {
         this.trackedAnimal = animal;
 
-        this.genomeTextFlow.getChildren().clear();
-        this.genomeTextFlow.getChildren()
+        this.genotypeListView.getItems().clear();
+        this.genotypeListView.getItems()
                 .addAll(animal.getGenomeView().toString().chars()
                         .mapToObj(c -> (char) c)
                         .map(String::valueOf)
                         .map(Text::new)
                         .toList());
 
-        previousIndex = 0;
-
+        this.previousIndex = 0;
         this.infoLabel.setVisible(false);
         this.infoLabel.setManaged(false);
 
@@ -82,13 +76,14 @@ public class AnimalDetailsPresenter {
             return;
 
         this.positionLabel.setText(this.trackedAnimal.getPosition().toString());
-        this.genomeTextFlow.getChildren().get(this.previousIndex).setStyle("-fx-fill: black");
-        this.genomeTextFlow.getChildren()
+        this.genotypeListView.getItems().get(this.previousIndex).getStyleClass().clear();
+        this.genotypeListView.getItems()
                 .get(this.trackedAnimal
                     .getGenomeView()
                     .getActiveGeneIndex())
-                .setStyle("-fx-fill: magenta; -fx-effect: dropshadow( gaussian, rgba(83, 34, 117, 0.8) , 7, 0.5 , 0 , 0);");
+                .getStyleClass().add("highlighted_gene");
         this.previousIndex = this.trackedAnimal.getGenomeView().getActiveGeneIndex();
+        this.genotypeListView.scrollTo(Math.max(0, this.previousIndex - 1));
 
         this.currentEnergy.setText(String.valueOf(this.trackedAnimal.getEnergyLevel()));
         this.grassEatenLabel.setText(String.valueOf(this.trackedAnimal.getGrassEaten()));
@@ -131,7 +126,7 @@ public class AnimalDetailsPresenter {
         this.trackedAnimal = null;
 
         this.positionLabel.setText("");
-        this.genomeTextFlow.getChildren().clear();
+        this.genotypeListView.getItems().clear();
         this.currentEnergy.setText("");
         this.grassEatenLabel.setText("");
         this.childCountLabel.setText("");

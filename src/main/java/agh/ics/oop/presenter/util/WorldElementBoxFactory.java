@@ -1,4 +1,4 @@
-package agh.ics.oop.util;
+package agh.ics.oop.presenter.util;
 
 import agh.ics.oop.model.world_elements.Animal;
 import agh.ics.oop.model.world_elements.IWorldElement;
@@ -40,7 +40,7 @@ public class WorldElementBoxFactory {
         return imageView;
     }
 
-    public static Node getAnimalBox(Animal animal, int size){
+    public static Node getAnimalBox(Animal animal, int size, boolean tracked){
         if(size < 20)
             return getSquare(size, animal.getColor());
 
@@ -65,6 +65,11 @@ public class WorldElementBoxFactory {
 
         vbox.getChildren().add(imageView);
         vbox.getChildren().add(rect);
+
+        vbox.getStyleClass().add("animal-node");
+        if(tracked){
+            vbox.getStyleClass().add("tracked-animal");
+        }
 
         return vbox;
     }

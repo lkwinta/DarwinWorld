@@ -19,7 +19,6 @@ import static java.lang.Math.min;
 @ToString(onlyExplicitlyIncluded = true)
 public class Animal implements IWorldElement, Comparable<Animal> {
     @Getter
-    @ToString.Include
     private Vector2d position;
     @Getter
     private MapDirection orientation;

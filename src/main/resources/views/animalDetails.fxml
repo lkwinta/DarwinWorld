@@ -1,53 +1,61 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ListView?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
-<?import javafx.scene.text.TextFlow?>
 
-<?import javafx.scene.control.Button?>
-<VBox spacing="5.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
-      fx:controller="agh.ics.oop.presenter.AnimalDetailsPresenter">
+<?import javafx.scene.layout.Pane?>
+<VBox maxWidth="250" spacing="5.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="agh.ics.oop.presenter.AnimalDetailsPresenter"
+        stylesheets="@../styles/simulation_stylesheet.css">
     <Label text="Animal selection:"/>
-    <Label fx:id="infoLabel" text="To select animal for tracking please pause the simulation!"/>
-    <ListView fx:id="animalDetailsListView" disable="true"/>
+    <Label fx:id="infoLabel" text="To select animal for tracking please pause the simulation!" wrapText="true"/>
+    <ListView fx:id="animalDetailsListView" disable="true" maxHeight="150"/>
     <Label text="Tracked animal details:"/>
     <VBox spacing="5.0">
         <HBox spacing="5.0">
             <Label text="Position:"/>
+            <Pane HBox.hgrow="ALWAYS"/>
             <Label fx:id="positionLabel"/>
         </HBox>
-        <HBox spacing="5.0">
+        <VBox spacing="5.0">
             <Label text="Genome:"/>
-            <TextFlow fx:id="genomeTextFlow"/>
-        </HBox>
+            <ListView maxHeight="40" fx:id="genotypeListView" orientation="HORIZONTAL"/>
+        </VBox>
         <HBox spacing="5.0">
             <Label text="Current energy:"/>
+            <Pane HBox.hgrow="ALWAYS"/>
             <Label fx:id="currentEnergy"/>
         </HBox>
         <HBox spacing="5.0">
             <Label text="Grass eaten:"/>
+            <Pane HBox.hgrow="ALWAYS"/>
             <Label fx:id="grassEatenLabel"/>
         </HBox>
         <HBox spacing="5.0">
             <Label text="Child count:"/>
+            <Pane HBox.hgrow="ALWAYS"/>
             <Label fx:id="childCountLabel"/>
         </HBox>
         <HBox spacing="5.0">
             <Label text="Descendants count:"/>
+            <Pane HBox.hgrow="ALWAYS"/>
             <Label fx:id="descendantsCountLabel"/>
         </HBox>
         <HBox spacing="5.0">
             <Label text="Age:"/>
+            <Pane HBox.hgrow="ALWAYS"/>
             <Label fx:id="ageLabel"/>
         </HBox>
-        <HBox spacing="5.0" fx:id="diedHBox" managed="false" visible="false">
+        <HBox fx:id="diedHBox" managed="false" spacing="5.0" visible="false">
             <Label text="Died at day:"/>
+            <Pane HBox.hgrow="ALWAYS"/>
             <Label fx:id="diedAtLabel"/>
         </HBox>
-        <Button text="Clear tracking" onAction="#onClearTrackingClick"/>
+        <Button onAction="#onClearTrackingClick" text="Clear tracking"/>
     </VBox>
     <padding>
         <Insets bottom="5.0" left="20.0" right="5.0" top="5.0"/>

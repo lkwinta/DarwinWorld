@@ -1,6 +1,5 @@
 package agh.ics.oop.model;
 
-import agh.ics.oop.ISimulationEventListener;
 import agh.ics.oop.model.util.RandomPositionGenerator;
 import agh.ics.oop.model.world_elements.*;
 import agh.ics.oop.model.world_map.AbstractWorldMap;
@@ -52,11 +51,10 @@ public class Simulation implements Runnable {
         Boundary mapBounds = worldMap.getMapBoundary();
         RandomPositionGenerator positionGenerator = new RandomPositionGenerator(
                 mapBounds.bottomLeft(),
-                mapBounds.topRight(),
-                this.configuration.getStartingAnimalsCount());
+                mapBounds.topRight());
 
         animalsSet = new HashSet<>(this.configuration.getStartingAnimalsCount());
-        positionGenerator.forEach((position) -> {
+        positionGenerator.stream().limit(configuration.getStartingAnimalsCount()).forEach((position) -> {
             Animal animal = new Animal(this.configuration.getAnimalStartingEnergy(), position, this.configuration);
             worldMap.place(animal);
             animalsSet.add(animal);
