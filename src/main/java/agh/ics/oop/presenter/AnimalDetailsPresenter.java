@@ -86,6 +86,8 @@ public class AnimalDetailsPresenter {
         this.genotypeListView.scrollTo(Math.max(0, this.previousIndex - 1));
 
         this.currentEnergy.setText(String.valueOf(this.trackedAnimal.getEnergyLevel()));
+        this.currentEnergy.setTextFill(this.trackedAnimal.getColor());
+
         this.grassEatenLabel.setText(String.valueOf(this.trackedAnimal.getGrassEaten()));
         this.childCountLabel.setText(String.valueOf(this.trackedAnimal.getChildrenCount()));
         this.descendantsCountLabel.setText(String.valueOf(this.trackedAnimal.getDescendantsCount()));

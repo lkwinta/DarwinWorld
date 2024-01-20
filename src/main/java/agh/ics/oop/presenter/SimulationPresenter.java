@@ -12,6 +12,7 @@ import agh.ics.oop.presenter.util.WorldElementBoxFactory;
 import javafx.application.Platform;
 import javafx.collections.ObservableList;
 import javafx.css.StyleClass;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.geometry.HPos;
 import javafx.geometry.Rectangle2D;
@@ -19,6 +20,7 @@ import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.Label;
 import javafx.scene.control.ToggleButton;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.stage.Screen;
@@ -26,6 +28,10 @@ import javafx.stage.Screen;
 import static agh.ics.oop.model.util.MathUtil.clamp;
 
 public class SimulationPresenter {
+    private static final int MAX_CELL_SIZE = 50;
+    private static final int MIN_CELL_SIZE = 3;
+    private static final int MAX_AXES_CELL_SIZE = 13;
+
     private int cellSize = 10;
     private final Vector2d xAxisMask = new Vector2d(1, 0);
     private final Vector2d yAxisMask = new Vector2d(0, 1);
@@ -35,6 +41,7 @@ public class SimulationPresenter {
     private Simulation simulation;
     private boolean simulationEnded = false;
     private int drawAxes = 0;
+    private Node lastSelectedNode = null;
 
     @FXML
     private GridPane mapGridPane;
@@ -90,7 +97,7 @@ public class SimulationPresenter {
                         cellSize,
                         element == animalDetailsViewController.getTrackedAnimal()
                 );
-                elementImageView.setOnMouseClicked((event) -> onElementClick(new Vector2d(element.getPosition().x(), element.getPosition().y())));
+                elementImageView.setOnMouseClicked((event) -> onElementClick(event, new Vector2d(element.getPosition().x(), element.getPosition().y())));
             } else {
                 elementImageView = WorldElementBoxFactory.getWorldElementBox(element, cellSize);
             }
@@ -103,11 +110,18 @@ public class SimulationPresenter {
         }
     }
 
-    private void onElementClick(Vector2d position) {
+    private void onElementClick(MouseEvent event, Vector2d position) {
         if(!animalsClickable)
             return;
 
         worldMap.getAnimalsAt(position).ifPresent(animalDetailsViewController::listAnimals);
+
+        ((Node)event.getSource()).getStyleClass().add("highlighted-field");
+
+        if(lastSelectedNode != null)
+            lastSelectedNode.getStyleClass().remove("highlighted-field");
+
+        lastSelectedNode = (Node)event.getSource();
     }
 
     private void addConstraints() {
@@ -151,10 +165,10 @@ public class SimulationPresenter {
         Rectangle2D screenSize = Screen.getPrimary().getBounds();
 
         this.cellSize = Math.min(
-                (int)Math.round(clamp(screenSize.getHeight()*0.75/height, 3, 50)),
-                (int)Math.round(clamp(screenSize.getWidth()*0.75/width, 3, 50)));
+                (int)Math.round(clamp(screenSize.getHeight()*0.75/height, MIN_CELL_SIZE, MAX_CELL_SIZE)),
+                (int)Math.round(clamp(screenSize.getWidth()*0.75/width, MIN_CELL_SIZE, MAX_CELL_SIZE)));
 
-        this.drawAxes = (cellSize >= 13 ? 1 : 0);
+        this.drawAxes = (cellSize >= MAX_AXES_CELL_SIZE ? 1 : 0);
 
         addConstraints();
 
