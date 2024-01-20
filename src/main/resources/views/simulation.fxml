@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.geometry.Insets?>
-<?import javafx.scene.control.Button?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.BorderPane?>
@@ -12,9 +11,10 @@
 <?import javafx.scene.control.ToggleButton?>
 <?import javafx.scene.control.Label?>
 <BorderPane minHeight="550.0" minWidth="850.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="agh.ics.oop.presenter.SimulationPresenter" fx:id="rootBorderPane">
+            fx:controller="agh.ics.oop.presenter.SimulationPresenter"
+            stylesheets="@../styles/simulation_stylesheet.css">
     <top>
-        <Label fx:id="simulationStatusLabel" text="Simulation is running" BorderPane.alignment="CENTER" textFill="green" style="-fx-font-size: 15pt"/>
+        <Label fx:id="simulationStatusLabel" text="Simulation is running" BorderPane.alignment="CENTER"/>
     </top>
     <center>
         <GridPane fx:id="mapGridPane" alignment="CENTER" gridLinesVisible="true" BorderPane.alignment="CENTER">

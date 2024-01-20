@@ -1,6 +1,4 @@
-package agh.ics.oop;
-
-import agh.ics.oop.model.Simulation;
+package agh.ics.oop.model;
 
 @FunctionalInterface
 public interface ISimulationEventListener {

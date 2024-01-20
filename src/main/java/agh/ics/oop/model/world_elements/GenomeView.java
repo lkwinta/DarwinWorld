@@ -14,4 +14,8 @@ public class GenomeView {
     public String toString() {
         return genome.toString();
     }
+
+    public int getActiveGeneIndex() {
+        return genome.getActiveGeneIndex();
+    }
 }

@@ -1,7 +1,5 @@
 package agh.ics.oop.model.world_elements;
 
-import lombok.ToString;
-
 import java.util.concurrent.ThreadLocalRandom;
 
 public enum Gene {

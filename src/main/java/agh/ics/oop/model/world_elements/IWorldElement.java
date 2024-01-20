@@ -4,7 +4,7 @@ import javafx.scene.paint.Color;
 
 @SuppressWarnings("unused")
 public interface IWorldElement {
-    Vector2d position();
+    Vector2d getPosition();
 
     boolean isAt(Vector2d position);
 

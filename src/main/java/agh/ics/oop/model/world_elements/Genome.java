@@ -1,7 +1,6 @@
 package agh.ics.oop.model.world_elements;
 
 import lombok.EqualsAndHashCode;
-import lombok.ToString;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -73,6 +72,11 @@ public class Genome {
     public Gene getActiveGene() {
         return genes.get(activeGene);
     }
+
+    public int getActiveGeneIndex() {
+        return activeGene;
+    }
+
     @Override
     public String toString() {
         return genes.stream()

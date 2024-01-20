@@ -1,4 +1,4 @@
-package agh.ics.oop.util;
+package agh.ics.oop.presenter.util;
 
 import agh.ics.oop.model.world_elements.Animal;
 import agh.ics.oop.model.world_elements.IWorldElement;
@@ -25,13 +25,19 @@ public class WorldElementBoxFactory {
         return imagesHashMap.get(url);
     }
 
-    private static Node getSquare(int size, Color color){
-        return new Rectangle(size, size, color);
+    private static Node getSquare(int size, Color color, boolean tracked, boolean animal){
+        Rectangle rect = new Rectangle(size, size, color);
+        if(tracked)
+            rect.getStyleClass().add("tracked-animal-small");
+        if(animal)
+            rect.getStyleClass().add("animal-node");
+
+        return rect;
     }
 
     public static Node getWorldElementBox(IWorldElement element, int size){
         if(size < 20)
-            return getSquare(size, element.getColor());
+            return getSquare(size, element.getColor(), false, false);
 
         ImageView imageView = new ImageView(getImage(element));
         imageView.setFitHeight(size);
@@ -40,9 +46,9 @@ public class WorldElementBoxFactory {
         return imageView;
     }
 
-    public static Node getAnimalBox(Animal animal, int size){
+    public static Node getAnimalBox(Animal animal, int size, boolean tracked){
         if(size < 20)
-            return getSquare(size, animal.getColor());
+            return getSquare(size, animal.getColor(), tracked, true);
 
         VBox vbox = new VBox();
         vbox.setMaxWidth(size);
@@ -65,6 +71,11 @@ public class WorldElementBoxFactory {
 
         vbox.getChildren().add(imageView);
         vbox.getChildren().add(rect);
+
+        vbox.getStyleClass().add("animal-node");
+        if(tracked){
+            vbox.getStyleClass().add("tracked-animal");
+        }
 
         return vbox;
     }

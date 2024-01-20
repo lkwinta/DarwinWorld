@@ -1,6 +1,5 @@
 package agh.ics.oop.model;
 
-import agh.ics.oop.ISimulationEventListener;
 import agh.ics.oop.model.util.RandomPositionGenerator;
 import agh.ics.oop.model.world_elements.*;
 import agh.ics.oop.model.world_map.AbstractWorldMap;
@@ -52,11 +51,10 @@ public class Simulation implements Runnable {
         Boundary mapBounds = worldMap.getMapBoundary();
         RandomPositionGenerator positionGenerator = new RandomPositionGenerator(
                 mapBounds.bottomLeft(),
-                mapBounds.topRight(),
-                this.configuration.getStartingAnimalsCount());
+                mapBounds.topRight());
 
         animalsSet = new HashSet<>(this.configuration.getStartingAnimalsCount());
-        positionGenerator.forEach((position) -> {
+        positionGenerator.stream().limit(configuration.getStartingAnimalsCount()).forEach((position) -> {
             Animal animal = new Animal(this.configuration.getAnimalStartingEnergy(), position, this.configuration);
             worldMap.place(animal);
             animalsSet.add(animal);
@@ -173,6 +171,7 @@ public class Simulation implements Runnable {
         deadAnimals.forEach(animalsSet::remove);
         deadAnimals.forEach((animal) ->
                 averageLifeSpan = (deadAnimalsCount*averageLifeSpan + animal.getAge())/(double)++deadAnimalsCount);
+        deadAnimals.forEach((animal) -> animal.setDiedAt(dayNumber));
     }
 
     private void processMoveAnimals() {
@@ -180,8 +179,8 @@ public class Simulation implements Runnable {
     }
 
     private void processAnimalsEating() {
-        for (Vector2d position : animalsSet.stream().map(Animal::position).collect(Collectors.toSet())) {
-            Animal topAnimal = worldMap.getTopAnimalsAt(position)
+        for (Vector2d position : animalsSet.stream().map(Animal::getPosition).collect(Collectors.toSet())) {
+            Animal topAnimal = worldMap.getAnimalsAt(position)
                     .orElseThrow().stream()
                     .sorted(Comparator.reverseOrder())
                     .limit(1)
@@ -197,9 +196,9 @@ public class Simulation implements Runnable {
     }
 
     private void processAnimalsReproduction() {
-        for (Vector2d position : animalsSet.stream().map(Animal::position).collect(Collectors.toSet())){
+        for (Vector2d position : animalsSet.stream().map(Animal::getPosition).collect(Collectors.toSet())){
             List<Animal> canBreed = worldMap
-                    .getTopAnimalsAt(position)
+                    .getAnimalsAt(position)
                     .orElseThrow().stream()
                     .filter(Animal::canBreed)
                     .sorted(Comparator.reverseOrder())

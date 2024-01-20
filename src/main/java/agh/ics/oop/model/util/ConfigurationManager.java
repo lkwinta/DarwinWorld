@@ -19,19 +19,15 @@ public class ConfigurationManager {
     private static Map<String, ModelConfiguration> configurations = new HashMap<>();
 
     public static void loadConfigurationsFromFile() throws IOException {
-        URL url = ConfigurationManager.class.getClassLoader().getResource(CONFIGURATION_FILE_PATH);
-        if(url == null)
-            throw new FileNotFoundException("Configuration file not found");
-
-        String path = URLDecoder.decode(url.getFile(), StandardCharsets.UTF_8);
-        File configurationFile = new File(path);
-
         String json = null;
 
-        try (BufferedReader reader = new BufferedReader(new FileReader(configurationFile))) {
-            json = reader.lines().reduce("", (acc, line) -> acc + line);
+        try (InputStream inputStream = ConfigurationManager.class.getClassLoader().getResourceAsStream(CONFIGURATION_FILE_PATH)) {
+            if(inputStream == null)
+                throw new FileNotFoundException("Configuration file not found");
+
+            json = new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
         } catch (IOException ex) {
-            System.out.printf("Failed to read configuration file: %s, with error: %s\n", configurationFile.getPath(), ex.getMessage());
+            System.out.printf("Failed to read configuration file with error: %s\n", ex.getMessage());
         }
 
         if(json == null)

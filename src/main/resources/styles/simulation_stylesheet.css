@@ -1,0 +1,37 @@
+.tracked-animal {
+    -fx-effect: dropshadow( three-pass-box, rgba(83, 34, 117, 0.8) , 7, 0.5 , 0 , 0);
+    -fx-background-color: #caa2fa
+}
+
+.tracked-animal-small {
+    -fx-effect: dropshadow( three-pass-box, rgba(83, 34, 117, 0.8) , 7, 0.5 , 0 , 0);
+    -fx-fill: #caa2fa;
+    -fx-border-width: 5px;
+    -fx-border-color: orange;
+}
+
+.selectable-animal:hover {
+    -fx-cursor: hand;
+}
+
+.animal-node {
+    -fx-cursor: default;
+}
+
+#simulationStatusLabel {
+    -fx-font-size: 15pt;
+    -fx-text-fill: green
+}
+
+.highlighted-field {
+    -fx-border-width: 2px;
+    -fx-border-color: red;
+    -fx-background-color: rgba(242, 236, 170, 1);
+    -fx-fill: purple;
+}
+
+.highlighted_gene {
+    -fx-fill: magenta;
+    -fx-font-weight: bold;
+    -fx-effect: dropshadow(three-pass-box, rgba(83, 34, 117, 1) , 7, 0.0 , 0 , 0);
+}
