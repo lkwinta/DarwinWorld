@@ -2,6 +2,7 @@ package agh.ics.oop.model.world_map;
 
 import agh.ics.oop.model.world_elements.Vector2d;
 
+@SuppressWarnings("unused")
 public enum MapDirection {
     NORTH("North", new Vector2d(0, 1)),
     NORTH_EAST("NorthEast", new Vector2d(1, 1)),

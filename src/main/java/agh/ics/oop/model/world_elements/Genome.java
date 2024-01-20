@@ -14,13 +14,6 @@ public class Genome {
     private final List<Gene> genes;
     private final IGenomeBehaviour genomeBehaviour;
 
-    public Genome(List<Gene> genes, IGenomeBehaviour genomeBehaviour){
-        this.genes = genes;
-        this.length = genes.size();
-        this.activeGene = 0;
-        this.genomeBehaviour = genomeBehaviour;
-    }
-
     private Genome(int length, IGenomeBehaviour genomeBehaviour){
         this.length = length;
         this.activeGene = 0;

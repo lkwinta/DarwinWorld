@@ -113,6 +113,7 @@ public class Simulation implements Runnable {
         listeners.get(event).add(listener);
     }
 
+    @SuppressWarnings("unused")
     public void removeListener(SimulationEvent event, ISimulationEventListener listener){
         if(!listeners.containsKey(event))
             throw new IllegalArgumentException("Given listener is not subscribed");

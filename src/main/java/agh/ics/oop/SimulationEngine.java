@@ -5,6 +5,7 @@ import agh.ics.oop.model.Simulation;
 import java.util.ArrayList;
 import java.util.List;
 
+@SuppressWarnings("unused")
 public class SimulationEngine {
     private final List<Simulation> simulationList;
     private final List<Thread> simulationThreadsList;
