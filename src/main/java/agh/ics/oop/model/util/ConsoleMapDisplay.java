@@ -3,6 +3,7 @@ package agh.ics.oop.model.util;
 import agh.ics.oop.model.world_map.AbstractWorldMap;
 import agh.ics.oop.model.world_map.IMapChangeListener;
 
+@SuppressWarnings("unused")
 public class ConsoleMapDisplay implements IMapChangeListener {
     private int updateCounter = 0;
     @Override

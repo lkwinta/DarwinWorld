@@ -10,14 +10,10 @@ import agh.ics.oop.model.world_map.Boundary;
 import agh.ics.oop.presenter.util.WorldElementBoxFactory;
 
 import javafx.application.Platform;
-import javafx.collections.ObservableList;
-import javafx.css.StyleClass;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.geometry.HPos;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Node;
-import javafx.scene.Parent;
 import javafx.scene.control.Label;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.input.MouseEvent;
@@ -47,13 +43,11 @@ public class SimulationPresenter {
     private GridPane mapGridPane;
     /* Kinda hacky approach to divide view, statisticsViewController name is derived automatically by included fx:id*/
     @FXML
-    private Parent statisticsView;
-    @FXML
+    @SuppressWarnings("unused")
     private StatisticsWindowPresenter statisticsViewController; // It is assigned from simulationWindow.fxml - file included in simulation.fxml
     /* Kinda hacky approach to divide view, statisticsViewController name is derived automatically by included fx:id*/
     @FXML
-    private Parent animalDetailsView;
-    @FXML
+    @SuppressWarnings("unused")
     private AnimalDetailsPresenter animalDetailsViewController; // It is assigned from simulationWindow.fxml - file included in simulation.fxml
     @FXML
     private ToggleButton pauseToggleButton;

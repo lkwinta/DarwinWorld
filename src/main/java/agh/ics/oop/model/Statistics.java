@@ -1,17 +1,10 @@
 package agh.ics.oop.model;
 
-import agh.ics.oop.model.world_elements.Gene;
-import agh.ics.oop.model.world_elements.Genome;
 import agh.ics.oop.model.world_elements.GenomeView;
-import javafx.beans.Observable;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 
 import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
-
-import java.util.List;
 
 @Getter
 public class Statistics {

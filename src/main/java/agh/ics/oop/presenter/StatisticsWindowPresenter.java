@@ -1,16 +1,11 @@
 package agh.ics.oop.presenter;
 
 import agh.ics.oop.model.Statistics;
-import agh.ics.oop.model.world_elements.Gene;
-import agh.ics.oop.model.world_elements.Genome;
 import agh.ics.oop.model.world_elements.GenomeView;
 import javafx.application.Platform;
 import javafx.beans.Observable;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
-import javafx.scene.control.ScrollPane;
-
-import java.util.List;
 
 public class StatisticsWindowPresenter {
     @FXML

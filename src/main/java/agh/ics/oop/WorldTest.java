@@ -1,19 +1,8 @@
 package agh.ics.oop;
 
-import agh.ics.oop.model.Statistics;
-import agh.ics.oop.model.util.ConfigurationManager;
-import agh.ics.oop.model.world_elements.FullPredestinationBehaviour;
-import agh.ics.oop.model.world_elements.Gene;
-import agh.ics.oop.model.world_elements.Genome;
-import agh.ics.oop.model.world_elements.GenomeView;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import lombok.Getter;
-
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.List;
 
 public class WorldTest {
     @Getter
@@ -78,12 +67,12 @@ public class WorldTest {
 //        System.out.println(genomeView1);
 //        System.out.println(genomeView.equals(genomeView1));
 
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy_MM_dd_HH_mm_ss_SSS");
-        System.out.println(LocalDateTime.now().format(formatter));
-        System.out.println(LocalDateTime.now().format(formatter));
-        System.out.println(LocalDateTime.now().format(formatter));
-        System.out.println(LocalDateTime.now().format(formatter));
-        try { Thread.sleep(10); } catch(Exception ex) {}
-        System.out.println(LocalDateTime.now().format(formatter));
+//        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy_MM_dd_HH_mm_ss_SSS");
+//        System.out.println(LocalDateTime.now().format(formatter));
+//        System.out.println(LocalDateTime.now().format(formatter));
+//        System.out.println(LocalDateTime.now().format(formatter));
+//        System.out.println(LocalDateTime.now().format(formatter));
+//        try { Thread.sleep(10); } catch(Exception ex) {}
+//        System.out.println(LocalDateTime.now().format(formatter));
     }
 }

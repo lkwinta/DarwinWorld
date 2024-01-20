@@ -1,7 +1,6 @@
 package agh.ics.oop.model.world_elements;
 
 import lombok.EqualsAndHashCode;
-import lombok.ToString;
 
 import java.util.ArrayList;
 import java.util.List;

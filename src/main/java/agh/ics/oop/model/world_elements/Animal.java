@@ -14,7 +14,6 @@ import java.util.concurrent.ThreadLocalRandom;
 import static agh.ics.oop.model.util.MathUtil.clamp;
 import static agh.ics.oop.model.util.MathUtil.getColorGradient;
 import static java.lang.Math.max;
-import static java.lang.Math.min;
 
 @ToString(onlyExplicitlyIncluded = true)
 public class Animal implements IWorldElement, Comparable<Animal> {
