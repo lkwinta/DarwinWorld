@@ -7,45 +7,47 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.TextFlow?>
 
+<?import javafx.scene.control.Button?>
 <VBox spacing="5.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
       fx:controller="agh.ics.oop.presenter.AnimalDetailsPresenter">
     <Label text="Animal selection:"/>
-    <Label text="To select animal for tracking please pause the simulation!"/>
-    <ListView fx:id="animalDetailsListView"/>
+    <Label fx:id="infoLabel" text="To select animal for tracking please pause the simulation!"/>
+    <ListView fx:id="animalDetailsListView" disable="true"/>
     <Label text="Tracked animal details:"/>
     <VBox spacing="5.0">
+        <HBox spacing="5.0">
+            <Label text="Position:"/>
+            <Label fx:id="positionLabel"/>
+        </HBox>
         <HBox spacing="5.0">
             <Label text="Genome:"/>
             <TextFlow fx:id="genomeTextFlow"/>
         </HBox>
         <HBox spacing="5.0">
             <Label text="Current energy:"/>
-            <Label fx:id="currentEnergy" text="0"/>
+            <Label fx:id="currentEnergy"/>
         </HBox>
         <HBox spacing="5.0">
             <Label text="Grass eaten:"/>
-            <Label fx:id="grassEatenLabel" text="0"/>
+            <Label fx:id="grassEatenLabel"/>
         </HBox>
         <HBox spacing="5.0">
             <Label text="Child count:"/>
-            <Label fx:id="childCountLabel" text="0"/>
+            <Label fx:id="childCountLabel"/>
         </HBox>
         <HBox spacing="5.0">
             <Label text="Descendants count:"/>
-            <Label fx:id="descendantsCountLabel" text="0"/>
+            <Label fx:id="descendantsCountLabel"/>
         </HBox>
         <HBox spacing="5.0">
-            <Label text="Is alive:"/>
-            <Label fx:id="isAliveLabel" text="0"/>
-        </HBox>
-        <HBox spacing="5.0" fx:id="aliveHBox">
             <Label text="Age:"/>
-            <Label fx:id="ageLabel" text="0"/>
+            <Label fx:id="ageLabel"/>
         </HBox>
-        <HBox spacing="5.0" fx:id="diedHBox">
+        <HBox spacing="5.0" fx:id="diedHBox" managed="false" visible="false">
             <Label text="Died at day:"/>
-            <Label fx:id="diedAtLabel" text="0"/>
+            <Label fx:id="diedAtLabel"/>
         </HBox>
+        <Button text="Clear tracking" onAction="#onClearTrackingClick"/>
     </VBox>
     <padding>
         <Insets bottom="5.0" left="20.0" right="5.0" top="5.0"/>

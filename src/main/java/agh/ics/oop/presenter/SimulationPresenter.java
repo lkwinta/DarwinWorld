@@ -56,6 +56,22 @@ public class SimulationPresenter {
     @FXML
     private Label simulationStatusLabel;
 
+    @FXML
+    private void onPlayClick() {
+        resumeToggleButton.setSelected(true);
+        pauseToggleButton.setSelected(false);
+
+        simulation.resume();
+    }
+
+    @FXML
+    private void onPauseClick() {
+        resumeToggleButton.setSelected(false);
+        pauseToggleButton.setSelected(true);
+
+        simulation.pause();
+    }
+
     private void drawMap() {
         //clear grid
         mapGridPane.getChildren().retainAll(mapGridPane.getChildren().get(0));
@@ -72,6 +88,9 @@ public class SimulationPresenter {
                 elementImageView = WorldElementBoxFactory.getAnimalBox(animal, cellSize);
                 elementImageView.setOnMouseClicked((event) -> onElementClick(new Vector2d(element.getPosition().x(), element.getPosition().y())));
                 elementImageView.setStyle("-fx-cursor: hand;");
+                if(element == animalDetailsViewController.getTrackedAnimal()) {
+                    elementImageView.setStyle("-fx-effect: dropshadow( three-pass-box, rgba(83, 34, 117, 0.8) , 7, 0.5 , 0 , 0); -fx-background-color: #caa2fa");
+                }
             } else {
                 elementImageView = WorldElementBoxFactory.getWorldElementBox(element, cellSize);
             }
@@ -85,15 +104,7 @@ public class SimulationPresenter {
     }
 
     private void onElementClick(Vector2d position) {
-        Optional<List<Animal>> animals = worldMap.getAnimalsAt(position);
-        if(animals.isPresent()){
-            animalDetailsViewController.listAnimals(animals.get());
-            animalDetailsViewController.setTrackedAnimal(animals.get().get(0));
-
-        } else {
-            animalDetailsViewController.listAnimals(List.of());
-        }
-
+        worldMap.getAnimalsAt(position).ifPresent(animalDetailsViewController::listAnimals);
     }
 
     private void addConstraints() {
@@ -121,7 +132,6 @@ public class SimulationPresenter {
         int value = start_value;
         for (int i = 1; i <= size; i++){
             Label axis_value = new Label(String.valueOf(value));
-            //axis_value.setMaxSize(cellSize, cellSize);
             GridPane.setHalignment(axis_value, HPos.CENTER);
             mapGridPane.add(axis_value, i * axis_mask.x(), i * axis_mask.y());
             value += step;
@@ -149,7 +159,10 @@ public class SimulationPresenter {
         simulation.addListener(Simulation.SimulationEvent.PAUSE, (sim) -> Platform.runLater(this::showSimulationPaused));
         simulation.addListener(Simulation.SimulationEvent.RESUME, (sim) -> Platform.runLater(this::showSimulationResumed));
         simulation.addListener(Simulation.SimulationEvent.END, (sim) -> Platform.runLater(this::showSimulationEnded));
+
         simulation.addListener(Simulation.SimulationEvent.TICK, (sim) -> Platform.runLater(animalDetailsViewController::updateHandler));
+        simulation.addListener(Simulation.SimulationEvent.PAUSE, (sim) -> Platform.runLater(animalDetailsViewController::enableTrackingChange));
+        simulation.addListener(Simulation.SimulationEvent.RESUME, (sim) -> Platform.runLater(animalDetailsViewController::disableTrackingChange));
     }
 
     private void showSimulationEnded() {
@@ -178,19 +191,4 @@ public class SimulationPresenter {
         statisticsViewController.subscribeStatisticListeners(statistics);
     }
 
-    @FXML
-    private void onPlayClick() {
-        resumeToggleButton.setSelected(true);
-        pauseToggleButton.setSelected(false);
-
-        simulation.resume();
-    }
-
-    @FXML
-    private void onPauseClick() {
-        resumeToggleButton.setSelected(false);
-        pauseToggleButton.setSelected(true);
-
-        simulation.pause();
-    }
 }

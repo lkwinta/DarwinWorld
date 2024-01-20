@@ -1,12 +1,14 @@
 package agh.ics.oop.presenter;
 
 import agh.ics.oop.model.world_elements.Animal;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.layout.HBox;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
+import lombok.Getter;
 
 import java.util.Arrays;
 import java.util.List;
@@ -16,7 +18,9 @@ import java.util.stream.StreamSupport;
 
 public class AnimalDetailsPresenter {
     @FXML
-    private HBox aliveHBox;
+    private Label infoLabel;
+    @FXML
+    private Label positionLabel;
     @FXML
     private HBox diedHBox;
     @FXML
@@ -30,20 +34,28 @@ public class AnimalDetailsPresenter {
     @FXML
     private Label descendantsCountLabel;
     @FXML
-    private Label isAliveLabel;
-    @FXML
     private Label ageLabel;
     @FXML
     private Label diedAtLabel;
     @FXML
-    private ListView<String> animalDetailsListView;
-
+    private ListView<Animal> animalDetailsListView;
+    @Getter
     private Animal trackedAnimal = null;
     private int previousIndex;
 
+    @FXML
+    private void initialize() {
+        animalDetailsListView.getSelectionModel()
+                .selectedItemProperty()
+                .addListener((observableValue, animal, t1) -> {
+            if(t1 != null)
+                setTrackedAnimal(t1);
+        });
+    }
+
     public void listAnimals(List<Animal> animals){
         animalDetailsListView.getItems().clear();
-        animals.forEach(animal -> animalDetailsListView.getItems().add("Animal at: " + animal.getPosition() + " has " + animal.getEnergyLevel() + " energy"));
+        animals.forEach(animal -> animalDetailsListView.getItems().add(animal));
     }
 
     public void setTrackedAnimal(Animal animal) {
@@ -58,21 +70,18 @@ public class AnimalDetailsPresenter {
                         .toList());
 
         previousIndex = 0;
-        updateHandler();
 
-//
-//        this.grassEatenLabel.setText(String.valueOf(animal.getGrassEaten()));
-//        this.childCountLabel.setText(String.valueOf(animal.getChildren().size()));
-//        this.descendantsCountLabel.setText(String.valueOf(animal.getDescendantsCount()));
-//        this.isAliveLabel.setText(String.valueOf(animal.isAlive()));
-//        this.ageLabel.setText(String.valueOf(animal.getAge()));
-//        this.diedAtLabel.setText(String.valueOf(animal.getDiedAt()));
+        this.infoLabel.setVisible(false);
+        this.infoLabel.setManaged(false);
+
+        updateHandler();
     }
 
     public void updateHandler() {
         if(this.trackedAnimal == null)
             return;
 
+        this.positionLabel.setText(this.trackedAnimal.getPosition().toString());
         this.genomeTextFlow.getChildren().get(this.previousIndex).setStyle("-fx-fill: black");
         this.genomeTextFlow.getChildren()
                 .get(this.trackedAnimal
@@ -86,25 +95,52 @@ public class AnimalDetailsPresenter {
         this.childCountLabel.setText(String.valueOf(this.trackedAnimal.getChildrenCount()));
         this.descendantsCountLabel.setText(String.valueOf(this.trackedAnimal.getDescendantsCount()));
 
-        this.isAliveLabel.setText(String.valueOf(this.trackedAnimal.isAlive()));
+        this.ageLabel.setText(String.valueOf(this.trackedAnimal.getAge()));
+
         if(this.trackedAnimal.isAlive()){
             this.diedHBox.setManaged(false);
             this.diedHBox.setVisible(false);
-            this.aliveHBox.setManaged(true);
-            this.aliveHBox.setVisible(true);
-
-            this.ageLabel.setText(String.valueOf(this.trackedAnimal.getAge()));
         } else {
             this.diedHBox.setManaged(true);
             this.diedHBox.setVisible(true);
-            this.aliveHBox.setManaged(false);
-            this.aliveHBox.setVisible(false);
 
             this.diedAtLabel.setText(String.valueOf(this.trackedAnimal.getDiedAt()));
         }
     }
 
-    public void removeTrackedAnimal() {
+    public void enableTrackingChange() {
+        this.animalDetailsListView.setDisable(false);
+        if(trackedAnimal == null){
+            this.infoLabel.setVisible(true);
+            this.infoLabel.setManaged(true);
+            this.infoLabel.setText("No animal selected");
+        }
+    }
+
+    public void disableTrackingChange() {
+        this.animalDetailsListView.setDisable(true);
+        if(trackedAnimal == null){
+            this.infoLabel.setVisible(true);
+            this.infoLabel.setManaged(true);
+            this.infoLabel.setText("To select animal for tracking please pause the simulation!");
+        }
+    }
+
+    @FXML
+    private void onClearTrackingClick() {
         this.trackedAnimal = null;
+
+        this.positionLabel.setText("");
+        this.genomeTextFlow.getChildren().clear();
+        this.currentEnergy.setText("");
+        this.grassEatenLabel.setText("");
+        this.childCountLabel.setText("");
+        this.descendantsCountLabel.setText("");
+        this.ageLabel.setText("");
+        this.diedAtLabel.setText("");
+
+        this.infoLabel.setVisible(true);
+        this.infoLabel.setManaged(true);
+        this.infoLabel.setText("No animal selected");
     }
 }

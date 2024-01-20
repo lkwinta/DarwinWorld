@@ -6,6 +6,7 @@ import agh.ics.oop.model.world_map.MapDirection;
 import javafx.scene.paint.Color;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
@@ -15,16 +16,20 @@ import static agh.ics.oop.model.util.MathUtil.getColorGradient;
 import static java.lang.Math.max;
 import static java.lang.Math.min;
 
+@ToString(onlyExplicitlyIncluded = true)
 public class Animal implements IWorldElement, Comparable<Animal> {
     @Getter
+    @ToString.Include
     private Vector2d position;
     @Getter
     private MapDirection orientation;
     @Getter
+    @ToString.Include
     private int energyLevel;
     private final Genome genome;
     private final ModelConfiguration configuration;
     @Getter
+    @ToString.Include
     private int age;
     private final List<Animal> children;
     @Getter
@@ -141,31 +146,7 @@ public class Animal implements IWorldElement, Comparable<Animal> {
     }
 
     @Override
-    public String toString(){
-        return switch (orientation) {
-            case NORTH -> "^";
-            case SOUTH -> "v";
-            case WEST -> "<";
-            case EAST -> ">";
-            case NORTH_WEST -> "7";
-            case NORTH_EAST -> "F";
-            case SOUTH_WEST -> "J";
-            case SOUTH_EAST -> "L";
-        };
-    }
-
-    @Override
     public String getResourceName() {
-//        return switch (orientation) {
-//            case NORTH -> "north.png";
-//            case SOUTH -> "south.png";
-//            case WEST -> "west.png";
-//            case NORTH_WEST -> "north_west.png";
-//            case NORTH_EAST -> "north_east.png";
-//            case EAST -> "east.png";
-//            case SOUTH_WEST -> "south_west.png";
-//            case SOUTH_EAST -> "south_east.png";
-//        };
         return "owlbear.png";
     }
 
