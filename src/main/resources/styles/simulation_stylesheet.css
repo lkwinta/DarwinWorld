@@ -30,6 +30,20 @@
     -fx-fill: purple;
 }
 
+.dominant-genotype-highlighted-field {
+    -fx-border-width: 2px;
+    -fx-border-color: #28288d;
+    -fx-background-color: rgb(51, 255, 154, 1);
+    -fx-fill: cyan;
+}
+
+.preferred-position-highlighted-field {
+    -fx-border-width: 2px;
+    -fx-border-color: #1e0f0f;
+    -fx-background-color: rgb(255, 136, 136, 0.5);
+    -fx-fill: #ff888888;
+}
+
 .highlighted_gene {
     -fx-fill: magenta;
     -fx-font-weight: bold;

@@ -150,6 +150,10 @@ public class Simulation implements Runnable {
         simulationPaused.set(false);
     }
 
+    public Set<Vector2d> getPreferredPositions() {
+        return grassGenerator.getPreferredPositions();
+    }
+
     private void updateStatistics() {
         List<IWorldElement> elements = worldMap.getElements();
 

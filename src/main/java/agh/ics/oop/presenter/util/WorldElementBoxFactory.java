@@ -79,4 +79,8 @@ public class WorldElementBoxFactory {
 
         return vbox;
     }
+
+    public static Node getDummyBox(int cellSize) {
+        return getSquare(cellSize, Color.TRANSPARENT, false, false);
+    }
 }

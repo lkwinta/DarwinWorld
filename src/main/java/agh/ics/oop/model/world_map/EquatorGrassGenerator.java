@@ -2,11 +2,14 @@ package agh.ics.oop.model.world_map;
 
 import agh.ics.oop.model.world_elements.Grass;
 import agh.ics.oop.model.world_elements.Vector2d;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Streams;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 public class EquatorGrassGenerator implements Iterator<Grass>, Iterable<Grass> {
@@ -14,6 +17,8 @@ public class EquatorGrassGenerator implements Iterator<Grass>, Iterable<Grass> {
     private final int equatorHeight;
     private final Set<Vector2d> freeEquatorPositions;
     private final Set<Vector2d> freeOtherPositions;
+    private final int width;
+    private final int height;
 
     public EquatorGrassGenerator(int width, int height){
         this.equatorYCoordinate = height / 2;
@@ -22,11 +27,10 @@ public class EquatorGrassGenerator implements Iterator<Grass>, Iterable<Grass> {
         this.freeOtherPositions = new HashSet<>(width*height - 2*equatorHeight*width);
         this.freeEquatorPositions = new HashSet<>(2*equatorHeight*width);
 
-        for(int x = 0; x < width; x++) {
-            for(int y = 0; y < height; y++){
-                 addFreePosition(new Vector2d(x, y));
-            }
-        }
+        this.height = height;
+        this.width = width;
+
+        getAllPositions().forEach(this::addFreePosition);
     }
 
     public void addFreePosition(Vector2d position) {
@@ -93,5 +97,21 @@ public class EquatorGrassGenerator implements Iterator<Grass>, Iterable<Grass> {
 
     public Stream<Grass> stream() {
         return Streams.stream(iterator());
+    }
+
+    public Set<Vector2d> getPreferredPositions() {
+        return getAllPositions().stream().filter(this::isPositionInEquator).collect(Collectors.toSet());
+    }
+
+    private List<Vector2d> getAllPositions() {
+        List<Integer> widthRange = new ArrayList<>(IntStream.range(0, width).boxed().toList());
+        List<Integer> heightRange = new ArrayList<>(IntStream.range(0, height).boxed().toList());
+
+        List<Vector2d> cartesianResult = new ArrayList<>();
+
+        Lists.cartesianProduct(widthRange, heightRange)
+                .forEach(position -> cartesianResult.add(new Vector2d(position.get(0), position.get(1))));
+
+        return cartesianResult;
     }
 }

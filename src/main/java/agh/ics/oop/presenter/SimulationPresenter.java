@@ -3,6 +3,7 @@ package agh.ics.oop.presenter;
 import agh.ics.oop.model.Simulation;
 import agh.ics.oop.model.Statistics;
 import agh.ics.oop.model.world_elements.Animal;
+import agh.ics.oop.model.world_elements.GenomeView;
 import agh.ics.oop.model.world_elements.IWorldElement;
 import agh.ics.oop.model.world_elements.Vector2d;
 import agh.ics.oop.model.world_map.AbstractWorldMap;
@@ -21,6 +22,11 @@ import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.stage.Screen;
 
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 import static agh.ics.oop.model.util.MathUtil.clamp;
 
 public class SimulationPresenter {
@@ -38,6 +44,7 @@ public class SimulationPresenter {
     private boolean simulationEnded = false;
     private int drawAxes = 0;
     private Node lastSelectedNode = null;
+    private boolean animalsClickable = false;
 
     @FXML
     private GridPane mapGridPane;
@@ -55,12 +62,19 @@ public class SimulationPresenter {
     private ToggleButton resumeToggleButton;
     @FXML
     private Label simulationStatusLabel;
-    private boolean animalsClickable = false;
+    @FXML
+    private ToggleButton showPreferredPositionsToggleButton;
+    @FXML
+    private ToggleButton showDominantGenotypeAnimalsToggleButton;
 
     @FXML
     private void onPlayClick() {
         resumeToggleButton.setSelected(true);
         pauseToggleButton.setSelected(false);
+        showPreferredPositionsToggleButton.setDisable(true);
+        showDominantGenotypeAnimalsToggleButton.setDisable(true);
+        showPreferredPositionsToggleButton.setSelected(false);
+        showDominantGenotypeAnimalsToggleButton.setSelected(false);
 
         simulation.resume();
     }
@@ -69,8 +83,62 @@ public class SimulationPresenter {
     private void onPauseClick() {
         resumeToggleButton.setSelected(false);
         pauseToggleButton.setSelected(true);
+        showPreferredPositionsToggleButton.setDisable(false);
+        showDominantGenotypeAnimalsToggleButton.setDisable(false);
+        showPreferredPositionsToggleButton.setSelected(false);
+        showDominantGenotypeAnimalsToggleButton.setSelected(false);
 
         simulation.pause();
+    }
+
+    private Vector2d getTranslatedNodePosition(Node node){
+        Boundary currentBounds = worldMap.getMapBoundary();
+
+        if(GridPane.getColumnIndex(node) == null || GridPane.getRowIndex(node) == null)
+            return new Vector2d(currentBounds.bottomLeft().x() - 1, currentBounds.bottomLeft().y() - 1); //new vector out of the bounds
+
+        return new Vector2d(
+                GridPane.getColumnIndex(node) + currentBounds.bottomLeft().x() - this.drawAxes,
+                this.height - GridPane.getRowIndex(node) - 1 + currentBounds.bottomLeft().y() + this.drawAxes);
+    }
+
+    @FXML
+    private void onShowDominantGenotypeAnimalsClick() {
+        GenomeView dominant = this.simulation.getSimulationStatistics().getDominateGenome().get();
+        Set<Vector2d> dominantGenomeAnimalsPositions = worldMap.getElements().stream()
+                .filter(Animal.class::isInstance)
+                .map(Animal.class::cast)
+                .filter(animal -> animal.getGenomeView().equals(dominant))
+                .map(Animal::getPosition)
+                .collect(Collectors.toSet());
+
+        Stream<Node> nodesToEdit = mapGridPane.getChildren().stream()
+                .filter((node) -> dominantGenomeAnimalsPositions.contains(getTranslatedNodePosition(node)));
+
+        if(showDominantGenotypeAnimalsToggleButton.isSelected())
+            nodesToEdit.forEach(node -> node.getStyleClass().add("dominant-genotype-highlighted-field"));
+        else
+            nodesToEdit.forEach(node -> node.getStyleClass().remove("dominant-genotype-highlighted-field"));
+    }
+
+    @FXML
+    public void onShowPreferredPositionsClick() {
+        if(showPreferredPositionsToggleButton.isSelected()){
+            Set<Vector2d> preferredPositions = this.simulation.getPreferredPositions();
+
+            for(Vector2d position : preferredPositions){
+                Node node = WorldElementBoxFactory.getDummyBox(cellSize);
+                node.getStyleClass().add("preferred-position-highlighted-field");
+                mapGridPane.add(node,
+                        position.x() - worldMap.getMapBoundary().bottomLeft().x() + this.drawAxes,
+                        this.height - (position.y() - worldMap.getMapBoundary().bottomLeft().y()) - 1 + this.drawAxes);
+            }
+        } else {
+            List<Node> toRemove = mapGridPane.getChildren().stream()
+                    .filter(node -> node.getStyleClass().contains("preferred-position-highlighted-field")).toList();
+
+            mapGridPane.getChildren().removeAll(toRemove);
+        }
     }
 
     private void drawMap() {
