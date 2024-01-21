@@ -119,6 +119,7 @@ public class SimulationConfigurationPresenter {
             stage.setOnCloseRequest(event -> simulationEngine.interruptSingleSimulation(id));
 
             stagesList.add(stage);
+            stage.setResizable(false);
             stage.show();
         } catch (NumberFormatException ex) {
             logError("Can't start simulation. Error parsing configuration.");

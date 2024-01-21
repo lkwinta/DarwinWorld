@@ -108,7 +108,11 @@ public class SimulationPresenter {
         if(!animalsClickable)
             return;
 
-        worldMap.getAnimalsAt(position).ifPresent(animalDetailsViewController::listAnimals);
+        animalDetailsViewController.listAnimals(
+                worldMap
+                    .objectsAt(position)
+                    .filter(Animal.class::isInstance)
+                    .map(Animal.class::cast).toList());
 
         ((Node)event.getSource()).getStyleClass().add("highlighted-field");
 

@@ -77,7 +77,7 @@ public class MapVisualizer {
     private String drawObject(Vector2d currentPosition) {
         return this.map
             .objectsAt(currentPosition)
-                .map(object -> object.get(0))
+                .findAny()
                 .map(IWorldElement::toString)
                 .orElse(EMPTY_CELL);
     }
