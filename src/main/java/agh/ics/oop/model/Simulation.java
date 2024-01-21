@@ -118,7 +118,7 @@ public class Simulation implements Runnable {
         if(interrupted() || animalsSet.isEmpty())
             return false;
 
-        if(configuration.getTotalSimulationDays() == Integer.MAX_VALUE)
+        if(configuration.getTotalSimulationDays() < 0)
             return true;
 
         return this.dayNumber < configuration.getTotalSimulationDays();

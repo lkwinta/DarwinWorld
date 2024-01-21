@@ -19,7 +19,7 @@
     "maxOceanSize": 5,
     "oceanChangeRate": 10,
     "millisecondsPerSimulationDay": 500,
-    "totalSimulationDays": 2147483647
+    "totalSimulationDays": -1
   },
   "defaultOceanMap": {
     "mapType": "OCEAN_MAP",
@@ -41,6 +41,6 @@
     "maxOceanSize": 5,
     "oceanChangeRate": 20,
     "millisecondsPerSimulationDay": 500,
-    "totalSimulationDays": 2147483647
+    "totalSimulationDays": -1
   }
 }

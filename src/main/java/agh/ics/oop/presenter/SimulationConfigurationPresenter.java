@@ -272,7 +272,13 @@ public class SimulationConfigurationPresenter {
     private ModelConfiguration getCurrentConfiguration() throws NumberFormatException {
         ModelConfiguration modelConfiguration = new ModelConfiguration();
 
-        modelConfiguration.setTotalSimulationDays(Integer.parseInt(totalSimulationDaysTextField.getText()));
+        if(totalSimulationDaysTextField.getText().contains("inf")){
+            modelConfiguration.setTotalSimulationDays(-1);
+        }
+        else {
+            modelConfiguration.setTotalSimulationDays(Integer.parseInt(totalSimulationDaysTextField.getText()));
+        }
+
         modelConfiguration.setMillisecondsPerSimulationDay(Integer.parseInt(millisecondsPerSimulationDayTextField.getText()));
 
         if(mapSelector.getValue().equals("EarthMap")) {
@@ -309,7 +315,12 @@ public class SimulationConfigurationPresenter {
     }
 
     private void setConfigurationFields(ModelConfiguration modelConfiguration) {
-        totalSimulationDaysTextField.setText(String.valueOf(modelConfiguration.getTotalSimulationDays()));
+        if(modelConfiguration.getTotalSimulationDays() < 0)
+            totalSimulationDaysTextField.setText("inf");
+        else {
+            totalSimulationDaysTextField.setText(String.valueOf(modelConfiguration.getTotalSimulationDays()));
+        }
+
         millisecondsPerSimulationDayTextField.setText(String.valueOf(modelConfiguration.getMillisecondsPerSimulationDay()));
 
         if(modelConfiguration.getMapType() == ModelConfiguration.MapType.EARTH_MAP) {
