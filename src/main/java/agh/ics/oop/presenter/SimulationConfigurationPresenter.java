@@ -135,8 +135,10 @@ public class SimulationConfigurationPresenter {
            
             SimulationPresenter simulationPresenter = fxmlLoader.getController();
 
-            int id = simulationEngine.runSingleAsync(getSimulation(simulationPresenter));
+            Simulation simulation = getSimulation(simulationPresenter);
+            int id = simulationEngine.runSingleAsync(simulation);
 
+            stage.setTitle(simulation.getSimulationId());
             stage.setOnCloseRequest(event -> simulationEngine.interruptSingleSimulation(id));
 
             stagesList.add(stage);
@@ -269,7 +271,6 @@ public class SimulationConfigurationPresenter {
     private void configureStage(Stage primaryStage, BorderPane viewRoot) {
         var scene = new Scene(viewRoot);
         primaryStage.setScene(scene);
-        primaryStage.setTitle("Simulation");
         primaryStage.minWidthProperty().bind(viewRoot.minWidthProperty());
         primaryStage.minHeightProperty().bind(viewRoot.minHeightProperty());
     }
