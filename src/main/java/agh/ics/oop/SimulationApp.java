@@ -21,7 +21,6 @@ public class SimulationApp extends Application {
 
             configureStage(primaryStage, viewRoot);
             SimulationConfigurationPresenter presenter = configurationLoader.getController();
-            presenter.loadConfigurations();
 
             primaryStage.setOnCloseRequest(event -> {
                 /*

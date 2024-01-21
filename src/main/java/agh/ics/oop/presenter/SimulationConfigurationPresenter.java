@@ -102,6 +102,27 @@ public class SimulationConfigurationPresenter {
     private CheckBox statisticsCSVSaveCheckbox;
 
     @FXML
+    private void initialize(){
+        try {
+            ConfigurationManager.loadConfigurationsFromFile();
+            configurationsListView.getItems().addAll(ConfigurationManager.getConfigurationNames());
+
+        } catch (Exception ex) {
+            logError("Failed to load configurations");
+            System.out.printf("Failed to load configurations with error: %s\n", ex.getMessage());
+        } finally {
+            if(configurationsListView.getItems().isEmpty()) {
+                logInfo("Loaded default configuration");
+                setConfigurationFields(new ModelConfiguration());
+            }
+            else {
+                setConfigurationFields(ConfigurationManager.getConfiguration(configurationsListView.getItems().get(0)));
+                logInfo("Successfully one of the configurations");
+            }
+        }
+    }
+
+    @FXML
     private void onSimulationStartClicked() {
         try {
             FXMLLoader fxmlLoader = new FXMLLoader();
@@ -130,24 +151,6 @@ public class SimulationConfigurationPresenter {
             System.out.println("Could not load fxml file: " + ex.getMessage());
             Platform.exit();
         }
-    }
-
-    @NotNull
-    private Simulation getSimulation(SimulationPresenter simulationPresenter) {
-        ModelConfiguration configuration = getCurrentConfiguration();
-        AbstractWorldMap map = configuration.getConstructedMap();
-
-        Statistics statistics = new Statistics();
-        Simulation simulation = new Simulation(map, configuration, statistics);
-
-        if(statisticsCSVSaveCheckbox.isSelected())
-            simulation.addListener(Simulation.SimulationEvent.TICK, new CSVSaver());
-
-        simulationPresenter.subscribeStatisticsListeners(statistics);
-        simulationPresenter.setupWaterStatistics(configuration.getMapType() == ModelConfiguration.MapType.OCEAN_MAP);
-        simulationPresenter.setup(map, configuration.getMapWidth(), configuration.getMapHeight(), simulation);
-
-        return simulation;
     }
 
     @FXML
@@ -223,6 +226,24 @@ public class SimulationConfigurationPresenter {
             System.out.println("Failed to save configurations with error: " + ex.getMessage());
         }
     }
+
+    @NotNull
+    private Simulation getSimulation(SimulationPresenter simulationPresenter) {
+        ModelConfiguration configuration = getCurrentConfiguration();
+        AbstractWorldMap map = configuration.getConstructedMap();
+
+        Statistics statistics = new Statistics();
+        Simulation simulation = new Simulation(map, configuration, statistics);
+
+        if(statisticsCSVSaveCheckbox.isSelected())
+            simulation.addListener(Simulation.SimulationEvent.TICK, new CSVSaver());
+
+        simulationPresenter.subscribeStatisticsListeners(statistics);
+        simulationPresenter.setupWaterStatistics(configuration.getMapType() == ModelConfiguration.MapType.OCEAN_MAP);
+        simulationPresenter.setup(map, configuration.getMapWidth(), configuration.getMapHeight(), simulation);
+
+        return simulation;
+    }
     
     public void onConfigurationApplicationClose() throws InterruptedException {
         simulationEngine.interruptAllSimulations();
@@ -246,17 +267,6 @@ public class SimulationConfigurationPresenter {
         primaryStage.setTitle("Simulation");
         primaryStage.minWidthProperty().bind(viewRoot.minWidthProperty());
         primaryStage.minHeightProperty().bind(viewRoot.minHeightProperty());
-    }
-
-    public void loadConfigurations() {
-        try {
-            ConfigurationManager.loadConfigurationsFromFile();
-            configurationsListView.getItems().addAll(ConfigurationManager.getConfigurationNames());
-
-        } catch (Exception ex) {
-            logError("Failed to load configurations");
-            System.out.printf("Failed to load configurations with error: %s\n", ex.getMessage());
-        }
     }
 
     private ModelConfiguration getCurrentConfiguration() throws NumberFormatException {
