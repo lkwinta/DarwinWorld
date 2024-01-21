@@ -144,6 +144,7 @@ public class SimulationConfigurationPresenter {
             simulation.addListener(Simulation.SimulationEvent.TICK, new CSVSaver());
 
         simulationPresenter.subscribeStatisticsListeners(statistics);
+        simulationPresenter.setupWaterStatistics(configuration.getMapType() == ModelConfiguration.MapType.OCEAN_MAP);
         simulationPresenter.setup(map, configuration.getMapWidth(), configuration.getMapHeight(), simulation);
 
         return simulation;

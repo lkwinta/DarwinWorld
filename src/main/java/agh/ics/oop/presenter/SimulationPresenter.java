@@ -224,4 +224,7 @@ public class SimulationPresenter {
         statisticsViewController.subscribeStatisticListeners(statistics);
     }
 
+    public void setupWaterStatistics(boolean waterCountVisible){
+        statisticsViewController.setWaterLabelEnabled(waterCountVisible);
+    }
 }

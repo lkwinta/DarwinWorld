@@ -160,6 +160,7 @@ public class Simulation implements Runnable {
         simulationStatistics.getAnimalsCount().setValue(animalsSet.size());
         simulationStatistics.getDeadAnimalsCount().setValue(deadAnimalsCount);
         simulationStatistics.getGrassCount().setValue((int)elements.stream().filter(Grass.class::isInstance).count());
+        simulationStatistics.getWaterCount().setValue((int)elements.stream().filter(Water.class::isInstance).count());
         simulationStatistics.getAverageEnergy().setValue(
                 animalsSet.stream()
                         .mapToInt(Animal::getEnergyLevel)
