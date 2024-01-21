@@ -27,13 +27,13 @@ public abstract class AbstractWorldMap implements IMoveHandler {
     protected final int height;
 
     protected AbstractWorldMap(int width, int height){
-        animalsMap = new ConcurrentHashMap<>();
-        grassMap = new ConcurrentHashMap<>();
+        this.animalsMap = new ConcurrentHashMap<>();
+        this.grassMap = new ConcurrentHashMap<>();
 
-        mapVisualizer = new MapVisualizer(this);
-        listeners = new ArrayList<>();
+        this.mapVisualizer = new MapVisualizer(this);
+        this.listeners = new ArrayList<>();
 
-        mapId = UUID.randomUUID();
+        this.mapId = UUID.randomUUID();
         this.mapBoundary = new Boundary(
                 new Vector2d(0,0),
                 new Vector2d(width - 1, height - 1)
@@ -68,6 +68,9 @@ public abstract class AbstractWorldMap implements IMoveHandler {
     }
 
     public void place(IWorldElement object) {
+        if(!this.getMapBoundary().inBounds(object.getPosition()))
+            throw new IllegalArgumentException("Cannot place object outside of map bounds");
+
         if(object instanceof Animal animal) {
             addToHashMap(animalsMap, animal.getPosition(), animal);
             mapChanged("Animal placed at: " + animal.getPosition());
@@ -109,53 +112,25 @@ public abstract class AbstractWorldMap implements IMoveHandler {
     }
 
     public boolean isOccupied(Vector2d position) {
-        return objectsAt(position).isPresent();
+        return objectsAt(position).findAny().isPresent();
     }
 
-    public Optional<List<Animal>> getAnimalsAt(Vector2d position) {
-        if(!animalsMap.containsKey(position))
-            return Optional.empty();
-
-        return Optional.of(animalsMap.get(position));
-    }
-
-    public Optional<Grass> getGrassAt(Vector2d position) {
-        if(!grassMap.containsKey(position))
-            return Optional.empty();
-
-        return Optional.of(grassMap.get(position));
-    }
-
-    public Optional<List<IWorldElement>> objectsAt(Vector2d position) {
-        if(animalsMap.containsKey(position) || grassMap.containsKey(position))
-            return Optional.of(
-                    Stream.concat(
-                            grassMap.containsKey(position) ? Stream.of(grassMap.get(position)) : Stream.empty(),
-                            animalsMap.containsKey(position) ? animalsMap.get(position).stream() : Stream.empty()
-                    ).toList()
-            );
-        else
-            return Optional.empty();
+    public Stream<IWorldElement> objectsAt(Vector2d position) {
+        return Streams.concat(
+            animalsMap.containsKey(position) ? animalsMap.get(position).stream() : Stream.empty(),
+            grassMap.containsKey(position) ? Stream.of(grassMap.get(position)) : Stream.empty()
+        );
     }
 
     public List<IWorldElement> getElements() {
-        return new ArrayList<>(
-                Streams.concat(
-                        grassMap.values().stream().map(grass -> (IWorldElement)grass),
-                        animalsMap.values().stream().flatMap(Collection::stream).toList().stream().map(animal -> (IWorldElement)animal)
-                ).toList());
+        return Streams.concat(
+            grassMap.values().stream().map(IWorldElement.class::cast),
+            animalsMap.values().stream().flatMap(Collection::stream).toList().stream().map(IWorldElement.class::cast)
+        ).toList();
     }
 
     public String toString() {
         Boundary currentBounds = getMapBoundary();
         return mapVisualizer.draw(currentBounds.bottomLeft(), currentBounds.topRight());
-    }
-
-    public int getGrassCount() {
-        return grassMap.size();
-    }
-
-    public int getTakenPositions() {
-        return (int)Streams.concat(animalsMap.keySet().stream(), grassMap.keySet().stream()).distinct().count();
     }
 }

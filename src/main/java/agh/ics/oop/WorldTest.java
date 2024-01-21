@@ -1,8 +1,11 @@
 package agh.ics.oop;
 
+import com.google.common.collect.Streams;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import lombok.Getter;
+
+import java.util.List;
 
 public class WorldTest {
     @Getter
@@ -74,5 +77,10 @@ public class WorldTest {
 //        System.out.println(LocalDateTime.now().format(formatter));
 //        try { Thread.sleep(10); } catch(Exception ex) {}
 //        System.out.println(LocalDateTime.now().format(formatter));
+
+        List<String> s1 = List.of("a", "b", "c");
+        List<String> s2 = List.of("1", "2", "3");
+
+        Streams.concat(s1.stream(), s2.stream()).forEach(System.out::println);
     }
 }

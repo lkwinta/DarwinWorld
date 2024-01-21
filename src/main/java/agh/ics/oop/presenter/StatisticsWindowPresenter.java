@@ -6,8 +6,13 @@ import javafx.application.Platform;
 import javafx.beans.Observable;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
+import javafx.scene.layout.HBox;
 
 public class StatisticsWindowPresenter {
+    @FXML
+    private HBox waterCountHBox;
+    @FXML
+    private Label waterCountLabel;
     @FXML
     private Label dayNumberLabel;
     @FXML
@@ -46,6 +51,10 @@ public class StatisticsWindowPresenter {
         Platform.runLater(() -> grassCountLabel.setText(String.valueOf(newValue)));
     }
 
+    private void setWaterCount(Observable observable, Integer oldValue, Integer newValue) {
+        Platform.runLater(() -> waterCountLabel.setText(String.valueOf(newValue)));
+    }
+
     private void setAverageEnergy(Observable observable, Double oldValue, Double newValue) {
         Platform.runLater(() -> averageEnergyLabel.setText("%.2f".formatted(newValue)));
     }
@@ -68,9 +77,15 @@ public class StatisticsWindowPresenter {
         statistics.getAnimalsCount().addListener(this::setAnimalsCount);
         statistics.getDeadAnimalsCount().addListener(this::setDeadAnimalsCount);
         statistics.getGrassCount().addListener(this::setGrassCount);
+        statistics.getWaterCount().addListener(this::setWaterCount);
         statistics.getAverageEnergy().addListener(this::setAverageEnergy);
         statistics.getAverageLifeSpan().addListener(this::setAverageLifeSpan);
         statistics.getAverageChildrenCount().addListener(this::setAverageChildrenCount);
         statistics.getDominateGenome().addListener(this::setDominantGenotype);
+    }
+
+    public void setWaterLabelEnabled(boolean enabled) {
+        waterCountHBox.setVisible(enabled);
+        waterCountHBox.setManaged(enabled);
     }
 }

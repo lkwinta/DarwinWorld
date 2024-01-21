@@ -35,6 +35,11 @@
         <Pane HBox.hgrow="ALWAYS"/>
         <Label fx:id="grassCountLabel" text="0"/>
     </HBox>
+    <HBox spacing="10.0" fx:id="waterCountHBox">
+        <Label contentDisplay="RIGHT" text="Water Count: "/>
+        <Pane HBox.hgrow="ALWAYS"/>
+        <Label fx:id="waterCountLabel" text="0"/>
+    </HBox>
     <HBox spacing="10.0">
         <Label contentDisplay="RIGHT" text="Average energy: "/>
         <Pane HBox.hgrow="ALWAYS"/>

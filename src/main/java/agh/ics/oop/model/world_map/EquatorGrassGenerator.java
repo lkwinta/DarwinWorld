@@ -36,6 +36,13 @@ public class EquatorGrassGenerator implements Iterator<Grass>, Iterable<Grass> {
             freeOtherPositions.add(position);
     }
 
+    public void removeFreePosition(Vector2d position) {
+        if(isPositionInEquator(position))
+            freeEquatorPositions.remove(position);
+        else
+            freeOtherPositions.remove(position);
+    }
+
     private boolean isPositionInEquator(Vector2d position){
         return position.y() >= equatorYCoordinate - equatorHeight && position.y() < equatorYCoordinate + equatorHeight;
     }

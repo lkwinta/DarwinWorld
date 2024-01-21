@@ -13,6 +13,7 @@ public class Statistics {
     private final ObjectProperty<Integer> animalsCount = new SimpleObjectProperty<>();
     private final ObjectProperty<Integer> deadAnimalsCount = new SimpleObjectProperty<>();
     private final ObjectProperty<Integer> grassCount = new SimpleObjectProperty<>();
+    private final ObjectProperty<Integer> waterCount = new SimpleObjectProperty<>();
     private final ObjectProperty<Double> averageEnergy = new SimpleObjectProperty<>();
     private final ObjectProperty<Double> averageLifeSpan = new SimpleObjectProperty<>();
     private final ObjectProperty<Double> averageChildrenCount = new SimpleObjectProperty<>();
@@ -24,6 +25,7 @@ public class Statistics {
                 "animalsCount;" +
                 "deadAnimalsCount;" +
                 "grassCount;" +
+                "waterCount;" +
                 "averageEnergy;" +
                 "averageLifeSpan;" +
                 "averageChildrenCount;" +
@@ -37,6 +39,7 @@ public class Statistics {
                 animalsCount.get() + ";" +
                 deadAnimalsCount.get() + ";" +
                 grassCount.get() + ";" +
+                waterCount.get() + ";" +
                 averageEnergy.get() + ";" +
                 averageLifeSpan.get() + ";" +
                 averageChildrenCount.get() + ";" +

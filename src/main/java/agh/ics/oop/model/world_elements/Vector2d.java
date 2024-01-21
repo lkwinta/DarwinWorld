@@ -1,5 +1,7 @@
 package agh.ics.oop.model.world_elements;
 
+import java.util.List;
+
 import static java.lang.Math.max;
 import static java.lang.Math.min;
 
@@ -92,4 +94,12 @@ public record Vector2d(int x, int y) {
         return false;
     }
 
+    public List<Vector2d> getNeighbours() {
+        return List.of(
+                new Vector2d(this.x, this.y - 1),
+                new Vector2d(this.x - 1, this.y),
+                new Vector2d(this.x + 1, this.y),
+                new Vector2d(this.x, this.y + 1)
+        );
+    }
 }

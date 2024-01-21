@@ -5,6 +5,7 @@ import agh.ics.oop.model.world_elements.*;
 import agh.ics.oop.model.world_map.AbstractWorldMap;
 import agh.ics.oop.model.world_map.Boundary;
 import agh.ics.oop.model.world_map.EquatorGrassGenerator;
+import agh.ics.oop.model.world_map.WaterGenerator;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
@@ -12,7 +13,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
 import static java.lang.Thread.interrupted;
 
@@ -20,6 +20,7 @@ public class Simulation implements Runnable {
     private final Set<Animal> animalsSet;
     private final AbstractWorldMap worldMap;
     private final EquatorGrassGenerator grassGenerator;
+    private final WaterGenerator waterGenerator;
     private final ModelConfiguration configuration;
     @Getter
     private final Statistics simulationStatistics;
@@ -31,6 +32,7 @@ public class Simulation implements Runnable {
     private final AtomicBoolean simulationPaused;
     @Getter
     private final String simulationId;
+    private int lastProcessedOceans = 0;
 
     public enum SimulationEvent {
         TICK,
@@ -39,7 +41,6 @@ public class Simulation implements Runnable {
         END
     }
 
-
     public Simulation(AbstractWorldMap worldMap, ModelConfiguration configuration, Statistics simulationStatistics) {
         this.worldMap = worldMap;
         this.configuration = configuration;
@@ -47,20 +48,30 @@ public class Simulation implements Runnable {
         this.listeners = new HashMap<>();
         this.genomeCount = new HashMap<>();
         this.simulationPaused = new AtomicBoolean(false);
+        this.grassGenerator = new EquatorGrassGenerator(configuration.getMapWidth(), configuration.getMapHeight());
+        this.waterGenerator = new WaterGenerator(configuration.getMaxOceanSize(), worldMap.getMapBoundary());
+        this.animalsSet = new HashSet<>(this.configuration.getStartingAnimalsCount());
 
         Boundary mapBounds = worldMap.getMapBoundary();
-        RandomPositionGenerator positionGenerator = new RandomPositionGenerator(
-                mapBounds.bottomLeft(),
-                mapBounds.topRight());
+        RandomPositionGenerator positionGenerator = new RandomPositionGenerator(mapBounds.bottomLeft(), mapBounds.topRight());
 
-        animalsSet = new HashSet<>(this.configuration.getStartingAnimalsCount());
         positionGenerator.stream().limit(configuration.getStartingAnimalsCount()).forEach((position) -> {
             Animal animal = new Animal(this.configuration.getAnimalStartingEnergy(), position, this.configuration);
             worldMap.place(animal);
             animalsSet.add(animal);
         });
 
-        grassGenerator = new EquatorGrassGenerator(configuration.getMapWidth(), configuration.getMapHeight());
+        if(configuration.getMapType() == ModelConfiguration.MapType.OCEAN_MAP) {
+            waterGenerator.generateStartingWaterPositions(
+                    configuration.getStartingOceanCount())
+                        .stream()
+                        .map(Water::new)
+                        .forEach((water) -> {
+                            worldMap.place(water);
+                            grassGenerator.removeFreePosition(water.getPosition());
+                        });
+        }
+
         grassGenerator.stream().limit(this.configuration.getStartingGrassCount()).forEach(worldMap::place);
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy_MM_dd_HH_mm_ss_SSS");
@@ -83,6 +94,13 @@ public class Simulation implements Runnable {
                 processAnimalsReproduction();
                 processGrowNewGrass();
                 processAnimalAging();
+
+                if(dayNumber - lastProcessedOceans > configuration.getOceanChangeRate() &&
+                        configuration.getMapType() == ModelConfiguration.MapType.OCEAN_MAP){
+                    processOceansSpreading();
+                    processObjectsUnderWater();
+                    lastProcessedOceans = dayNumber;
+                }
 
                 updateStatistics();
                 notifyListeners(SimulationEvent.TICK);
@@ -132,13 +150,17 @@ public class Simulation implements Runnable {
     }
 
     private void updateStatistics() {
+        List<IWorldElement> elements = worldMap.getElements();
+
         simulationStatistics.getDayNumber().setValue(dayNumber);
 
         int mapPositions = worldMap.getMapBoundary().getArea();
-        simulationStatistics.getFreePositions().setValue(mapPositions - worldMap.getTakenPositions());
+        simulationStatistics.getFreePositions().setValue(
+                mapPositions - (int)elements.stream().map(IWorldElement::getPosition).distinct().count());
         simulationStatistics.getAnimalsCount().setValue(animalsSet.size());
         simulationStatistics.getDeadAnimalsCount().setValue(deadAnimalsCount);
-        simulationStatistics.getGrassCount().setValue(worldMap.getGrassCount());
+        simulationStatistics.getGrassCount().setValue((int)elements.stream().filter(Grass.class::isInstance).count());
+        simulationStatistics.getWaterCount().setValue((int)elements.stream().filter(Water.class::isInstance).count());
         simulationStatistics.getAverageEnergy().setValue(
                 animalsSet.stream()
                         .mapToInt(Animal::getEnergyLevel)
@@ -180,27 +202,30 @@ public class Simulation implements Runnable {
     }
 
     private void processAnimalsEating() {
-        for (Vector2d position : animalsSet.stream().map(Animal::getPosition).collect(Collectors.toSet())) {
-            Animal topAnimal = worldMap.getAnimalsAt(position)
-                    .orElseThrow().stream()
+        List<Vector2d> animalPositions = animalsSet.stream().map(Animal::getPosition).distinct().toList();
+        for(Vector2d position : animalPositions) {
+            Animal topAnimal = worldMap.objectsAt(position)
+                    .filter(Animal.class::isInstance)
+                    .map(Animal.class::cast)
                     .sorted(Comparator.reverseOrder())
                     .limit(1)
                     .toList().get(0);
 
-            Optional<Grass> grass = worldMap.getGrassAt(position);
-            if(grass.isEmpty()) continue;
-
-            topAnimal.eat();
-            worldMap.remove(grass.get());
-            grassGenerator.addFreePosition(position);
+            Optional<Grass> grass = worldMap.objectsAt(position).filter(Grass.class::isInstance).map(Grass.class::cast).findAny();
+            if(grass.isPresent()){
+                topAnimal.eat();
+                worldMap.remove(grass.get());
+                grassGenerator.addFreePosition(position);
+            }
         }
     }
 
     private void processAnimalsReproduction() {
-        for (Vector2d position : animalsSet.stream().map(Animal::getPosition).collect(Collectors.toSet())){
-            List<Animal> canBreed = worldMap
-                    .getAnimalsAt(position)
-                    .orElseThrow().stream()
+        List<Vector2d> animalPositions = animalsSet.stream().map(Animal::getPosition).distinct().toList();
+        for(Vector2d position : animalPositions) {
+            List<Animal> canBreed = worldMap.objectsAt(position)
+                    .filter(Animal.class::isInstance)
+                    .map(Animal.class::cast)
                     .filter(Animal::canBreed)
                     .sorted(Comparator.reverseOrder())
                     .toList();
@@ -224,6 +249,39 @@ public class Simulation implements Runnable {
 
     private void processAnimalAging() {
         animalsSet.forEach(Animal::age);
+    }
+
+    private void processOceansSpreading() {
+        List<Collection<Vector2d>> changedWaterPositions = waterGenerator.generateSpreadPositions();
+
+        changedWaterPositions.get(0).stream()
+                .map(Water::new)
+                .forEach(worldMap::place);
+        changedWaterPositions.get(0).forEach(grassGenerator::removeFreePosition);
+
+        changedWaterPositions.get(1).stream()
+                .map(Water::new)
+                .forEach(worldMap::remove);
+        changedWaterPositions.get(1).forEach(grassGenerator::addFreePosition);
+    }
+
+    private void processObjectsUnderWater() {
+        List<Vector2d> waterPositions = worldMap.getElements().stream()
+                .filter(Water.class::isInstance)
+                .map(IWorldElement::getPosition)
+                .toList();
+
+        for(Vector2d position : waterPositions){
+            List<IWorldElement> toRemove = worldMap.objectsAt(position)
+                    .filter(Predicate.not(Water.class::isInstance))
+                    .toList();
+
+            toRemove.forEach(worldMap::remove);
+            toRemove.stream()
+                    .filter(Animal.class::isInstance)
+                    .map(Animal.class::cast)
+                    .forEach(animalsSet::remove);
+        }
     }
 
     private void notifyListeners(SimulationEvent event){

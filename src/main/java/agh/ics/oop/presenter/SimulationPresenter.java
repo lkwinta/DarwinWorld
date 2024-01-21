@@ -108,7 +108,11 @@ public class SimulationPresenter {
         if(!animalsClickable)
             return;
 
-        worldMap.getAnimalsAt(position).ifPresent(animalDetailsViewController::listAnimals);
+        animalDetailsViewController.listAnimals(
+                worldMap
+                    .objectsAt(position)
+                    .filter(Animal.class::isInstance)
+                    .map(Animal.class::cast).toList());
 
         ((Node)event.getSource()).getStyleClass().add("highlighted-field");
 
@@ -220,4 +224,7 @@ public class SimulationPresenter {
         statisticsViewController.subscribeStatisticListeners(statistics);
     }
 
+    public void setupWaterStatistics(boolean waterCountVisible){
+        statisticsViewController.setWaterLabelEnabled(waterCountVisible);
+    }
 }

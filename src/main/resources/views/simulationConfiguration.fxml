@@ -57,7 +57,7 @@
                         <VBox>
                             <Label text="Starting ocean count:"/>
                             <TextField fx:id="startingOceanCountTextField"/>
-                            <Label text="Max ocean size:"/>
+                            <Label text="Max ocean size: (how many blocks from center to expand)"/>
                             <TextField fx:id="maxOceanSizeTextField"/>
                             <Label text="Ocean change rate: (how many days to change)"/>
                             <TextField fx:id="oceanChangeRateTextField"/>

@@ -25,7 +25,7 @@
 
 .highlighted-field {
     -fx-border-width: 2px;
-    -fx-border-color: red;
+    -fx-border-color: orange;
     -fx-background-color: rgba(242, 236, 170, 1);
     -fx-fill: purple;
 }
