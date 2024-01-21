@@ -35,6 +35,8 @@ public class Animal implements IWorldElement, Comparable<Animal> {
     @Getter
     @Setter
     private int diedAt = -1;
+    @Getter
+    private String deathReason = "";
 
     public Animal(int initialEnergyLevel, Vector2d initialPosition, ModelConfiguration configuration){
         this.children = new ArrayList<>();
@@ -76,6 +78,9 @@ public class Animal implements IWorldElement, Comparable<Animal> {
 
         this.genome.nextGene();
         this.energyLevel -= this.configuration.getAnimalEnergyLossPerMove();
+
+        if(this.energyLevel <= 0)
+            this.deathReason = "Starvation";
     }
 
     public void age(){
@@ -111,6 +116,11 @@ public class Animal implements IWorldElement, Comparable<Animal> {
         this.energyLevel -= this.configuration.getAnimalEnergyGivenToChild();
         other.energyLevel -= this.configuration.getAnimalEnergyGivenToChild();
 
+        if(this.energyLevel <= 0)
+            this.deathReason = "Maternal death";
+        if(other.energyLevel <= 0)
+            other.deathReason = "Maternal death";
+
         Animal child = new Animal(2*this.configuration.getAnimalEnergyGivenToChild(), newGenome, other.getPosition(), this.configuration);
         this.children.add(child);
 
@@ -133,6 +143,12 @@ public class Animal implements IWorldElement, Comparable<Animal> {
 
     public boolean canBreed() {
         return energyLevel > this.configuration.getAnimalReadyToBreedEnergyLevel();
+    }
+
+    public void die(int day, String deathReason){
+        this.energyLevel = 0;
+        this.diedAt = day;
+        this.deathReason = deathReason;
     }
 
     public GenomeView getGenomeView() {

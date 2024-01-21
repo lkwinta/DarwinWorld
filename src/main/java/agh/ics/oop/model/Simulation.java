@@ -280,7 +280,10 @@ public class Simulation implements Runnable {
             toRemove.stream()
                     .filter(Animal.class::isInstance)
                     .map(Animal.class::cast)
-                    .forEach(animalsSet::remove);
+                    .forEach((animal) -> {
+                        animalsSet.remove(animal);
+                        animal.die(this.dayNumber, "Drowned");
+                    });
         }
     }
 

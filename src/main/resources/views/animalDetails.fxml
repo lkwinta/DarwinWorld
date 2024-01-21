@@ -5,12 +5,12 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ListView?>
 <?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Pane?>
 <?import javafx.scene.layout.VBox?>
 
-<?import javafx.scene.layout.Pane?>
-<VBox maxWidth="250" spacing="5.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
-      fx:controller="agh.ics.oop.presenter.AnimalDetailsPresenter"
-        stylesheets="@../styles/simulation_stylesheet.css">
+<VBox maxWidth="250" spacing="5.0" stylesheets="@../styles/simulation_stylesheet.css"
+      xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="agh.ics.oop.presenter.AnimalDetailsPresenter">
     <Label text="Animal selection:"/>
     <Label fx:id="infoLabel" text="To select animal for tracking please pause the simulation!" wrapText="true"/>
     <ListView fx:id="animalDetailsListView" disable="true" maxHeight="150"/>
@@ -23,7 +23,7 @@
         </HBox>
         <VBox spacing="5.0">
             <Label text="Genome:"/>
-            <ListView maxHeight="40" fx:id="genotypeListView" orientation="HORIZONTAL"/>
+            <ListView fx:id="genotypeListView" maxHeight="40" orientation="HORIZONTAL"/>
         </VBox>
         <HBox spacing="5.0">
             <Label text="Current energy:"/>
@@ -50,11 +50,18 @@
             <Pane HBox.hgrow="ALWAYS"/>
             <Label fx:id="ageLabel"/>
         </HBox>
-        <HBox fx:id="diedHBox" managed="false" spacing="5.0" visible="false">
-            <Label text="Died at day:"/>
-            <Pane HBox.hgrow="ALWAYS"/>
-            <Label fx:id="diedAtLabel"/>
-        </HBox>
+        <VBox fx:id="diedVBox" spacing="5.0">
+            <HBox spacing="5.0">
+                <Label text="Died at day:"/>
+                <Pane HBox.hgrow="ALWAYS"/>
+                <Label fx:id="diedAtLabel"/>
+            </HBox>
+            <HBox spacing="5.0">
+                <Label text="Death reason:"/>
+                <Pane HBox.hgrow="ALWAYS"/>
+                <Label fx:id="deathReasonLabel"/>
+            </HBox>
+        </VBox>
         <Button onAction="#onClearTrackingClick" text="Clear tracking"/>
     </VBox>
     <padding>

@@ -4,7 +4,7 @@ import agh.ics.oop.model.world_elements.Animal;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
-import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import lombok.Getter;
 
@@ -12,11 +12,13 @@ import java.util.List;
 
 public class AnimalDetailsPresenter {
     @FXML
+    private Label deathReasonLabel;
+    @FXML
     private Label infoLabel;
     @FXML
     private Label positionLabel;
     @FXML
-    private HBox diedHBox;
+    private VBox diedVBox;
     @FXML
     private Label currentEnergy;
     @FXML
@@ -95,13 +97,14 @@ public class AnimalDetailsPresenter {
         this.ageLabel.setText(String.valueOf(this.trackedAnimal.getAge()));
 
         if(this.trackedAnimal.isAlive()){
-            this.diedHBox.setManaged(false);
-            this.diedHBox.setVisible(false);
+            this.diedVBox.setManaged(false);
+            this.diedVBox.setVisible(false);
         } else {
-            this.diedHBox.setManaged(true);
-            this.diedHBox.setVisible(true);
+            this.diedVBox.setManaged(true);
+            this.diedVBox.setVisible(true);
 
             this.diedAtLabel.setText(String.valueOf(this.trackedAnimal.getDiedAt()));
+            this.deathReasonLabel.setText(this.trackedAnimal.getDeathReason());
         }
     }
 
@@ -135,6 +138,7 @@ public class AnimalDetailsPresenter {
         this.descendantsCountLabel.setText("");
         this.ageLabel.setText("");
         this.diedAtLabel.setText("");
+        this.deathReasonLabel.setText("");
 
         this.infoLabel.setVisible(true);
         this.infoLabel.setManaged(true);
