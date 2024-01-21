@@ -7,6 +7,7 @@ import agh.ics.oop.model.world_map.Boundary;
 import agh.ics.oop.model.world_map.EquatorGrassGenerator;
 import agh.ics.oop.model.world_map.WaterGenerator;
 import lombok.Getter;
+import org.javatuples.Pair;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -252,17 +253,17 @@ public class Simulation implements Runnable {
     }
 
     private void processOceansSpreading() {
-        List<Collection<Vector2d>> changedWaterPositions = waterGenerator.generateSpreadPositions();
+        Pair<Collection<Vector2d>, Collection<Vector2d>> changedWaterPositions = waterGenerator.generateSpreadPositions();
 
-        changedWaterPositions.get(0).stream()
+        changedWaterPositions.getValue0().stream()
                 .map(Water::new)
                 .forEach(worldMap::place);
-        changedWaterPositions.get(0).forEach(grassGenerator::removeFreePosition);
+        changedWaterPositions.getValue0().forEach(grassGenerator::removeFreePosition);
 
-        changedWaterPositions.get(1).stream()
+        changedWaterPositions.getValue1().stream()
                 .map(Water::new)
                 .forEach(worldMap::remove);
-        changedWaterPositions.get(1).forEach(grassGenerator::addFreePosition);
+        changedWaterPositions.getValue1().forEach(grassGenerator::addFreePosition);
     }
 
     private void processObjectsUnderWater() {

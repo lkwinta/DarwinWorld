@@ -41,6 +41,7 @@ dependencies {
     testAnnotationProcessor 'org.projectlombok:lombok:1.18.30'
 
     implementation 'org.jetbrains:annotations:24.0.0'
+    implementation("org.javatuples:javatuples:1.2")
 }
 
 test {

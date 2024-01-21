@@ -2,17 +2,18 @@ package agh.ics.oop.model.world_map;
 
 import agh.ics.oop.model.util.UniqueRandomPositionGenerator;
 import agh.ics.oop.model.world_elements.Vector2d;
+import org.javatuples.Pair;
 
 import java.util.*;
 
 public class WaterGenerator {
-    private final Set<Ocean> oceans;
+    private final List<Ocean> oceans;
     private final UniqueRandomPositionGenerator positionGenerator;
     private final int maxSize;
     private final Boundary mapBoundary;
 
     public WaterGenerator(int maxSize, Boundary mapBoundary){
-        this.oceans = new HashSet<>();
+        this.oceans = new ArrayList<>();
         this.positionGenerator = new UniqueRandomPositionGenerator(
                 mapBoundary.bottomLeft(), mapBoundary.topRight(), mapBoundary.getArea());
         this.maxSize = maxSize;
@@ -31,19 +32,22 @@ public class WaterGenerator {
         return positions;
     }
 
-    public List<Collection<Vector2d>> generateSpreadPositions(){
-        List<Collection<Vector2d>> result = new ArrayList<>();
-        result.add(new ArrayList<>());
-        result.add(new ArrayList<>());
+    public Pair<Collection<Vector2d>, Collection<Vector2d>> generateSpreadPositions(){
+        Pair<Collection<Vector2d>, Collection<Vector2d>> results = new Pair<>(new ArrayList<>(), new ArrayList<>());
 
         for(Ocean ocean : oceans){
-            List<Collection<Vector2d>> oceanResult = ocean.spreadOcean();
-
-            result.get(0).addAll(oceanResult.get(0));
-            result.get(1).addAll(oceanResult.get(1));
+            Pair<Collection<Vector2d>, Collection<Vector2d>> oceanResult = ocean.spreadOcean();
+            results.getValue0().addAll(oceanResult.getValue0());
+            results.getValue1().addAll(oceanResult.getValue1());
         }
 
-        return result;
+        List<Vector2d> removePositions = results.getValue1()
+                .stream()
+                .distinct()
+                .filter((position) -> oceans.stream().noneMatch(ocean -> ocean.contains(position)))
+                .toList();
+
+        return new Pair<>(results.getValue0(), removePositions);
     }
 
 }

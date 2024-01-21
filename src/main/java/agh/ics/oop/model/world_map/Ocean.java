@@ -1,6 +1,7 @@
 package agh.ics.oop.model.world_map;
 
 import agh.ics.oop.model.world_elements.Vector2d;
+import org.javatuples.Pair;
 
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
@@ -41,16 +42,16 @@ public class Ocean {
         return borderPositions;
     }
 
-    public List<Collection<Vector2d>> spreadOcean() {
+    public Pair<Collection<Vector2d>, Collection<Vector2d>> spreadOcean() {
         HashSet<Vector2d> newWaterPositions = new HashSet<>();
         List<Vector2d> positionsToRemove = new ArrayList<>();
 
-        boolean shouldSpread = ThreadLocalRandom.current().nextFloat() >= 2.0/5.0;
+        boolean shouldSpread = ThreadLocalRandom.current().nextFloat() >= 2.5/5.0;
         List<Vector2d> borderPositions = getBorderPositions();
 
         if(shouldSpread){
             if(currentRadius >= maxRadius)
-                return new ArrayList<>(List.of(newWaterPositions, positionsToRemove));
+                return new Pair<>(newWaterPositions, positionsToRemove);
 
             borderPositions.stream()
                     .map(Vector2d::getNeighbours)
@@ -72,6 +73,10 @@ public class Ocean {
                 this.currentRadius -= 1;
         }
 
-        return new ArrayList<>(List.of(newWaterPositions, positionsToRemove));
+        return new Pair<>(newWaterPositions, positionsToRemove);
+    }
+
+    public boolean contains(Vector2d position) {
+        return waterPositions.contains(position);
     }
 }
