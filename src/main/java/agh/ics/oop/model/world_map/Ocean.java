@@ -49,7 +49,7 @@ public class Ocean {
         List<Vector2d> borderPositions = getBorderPositions();
 
         if(shouldSpread){
-            if(currentRadius + 1 >= maxRadius)
+            if(currentRadius >= maxRadius)
                 return new ArrayList<>(List.of(newWaterPositions, positionsToRemove));
 
             borderPositions.stream()
@@ -68,7 +68,8 @@ public class Ocean {
                             .filter(Predicate.not(startingPoint::equals))
                             .toList());
             positionsToRemove.forEach(waterPositions::remove);
-            this.currentRadius -= 1;
+            if(this.currentRadius > 0)
+                this.currentRadius -= 1;
         }
 
         return new ArrayList<>(List.of(newWaterPositions, positionsToRemove));
