@@ -142,14 +142,17 @@ public class SimulationConfigurationPresenter {
             stagesList.add(stage);
             stage.setResizable(false);
             stage.show();
+
+            logInfo("Successfully started simulation");
         } catch (NumberFormatException ex) {
             logError("Can't start simulation. Error parsing configuration.");
             System.out.println("Can't start simulation. Error parsing configuration: " + ex.getMessage());
-        }
-        catch (IOException ex) {
+        } catch (IOException ex) {
             /* Crash the application, can't continue without necessary view */
             System.out.println("Could not load fxml file: " + ex.getMessage());
             Platform.exit();
+        } catch (IllegalArgumentException ex) {
+            logError(ex.getMessage());
         }
     }
 
@@ -228,8 +231,10 @@ public class SimulationConfigurationPresenter {
     }
 
     @NotNull
-    private Simulation getSimulation(SimulationPresenter simulationPresenter) {
+    private Simulation getSimulation(SimulationPresenter simulationPresenter) throws IllegalArgumentException {
         ModelConfiguration configuration = getCurrentConfiguration();
+        configuration.validate();
+
         AbstractWorldMap map = configuration.getConstructedMap();
 
         Statistics statistics = new Statistics();
