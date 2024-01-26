@@ -7,7 +7,7 @@ import lombok.Getter;
 
 import java.util.List;
 
-public class WorldTest {
+public class WorldTest { // czy to jest do czegoś potrzebne?
     @Getter
     static ObjectProperty<Integer> objectProperty = new SimpleObjectProperty<>();
 

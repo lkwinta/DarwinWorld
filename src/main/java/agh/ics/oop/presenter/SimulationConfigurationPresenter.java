@@ -107,7 +107,7 @@ public class SimulationConfigurationPresenter {
             ConfigurationManager.loadConfigurationsFromFile();
             configurationsListView.getItems().addAll(ConfigurationManager.getConfigurationNames());
 
-        } catch (Exception ex) {
+        } catch (Exception ex) { // ?
             logError("Failed to load configurations");
             System.out.printf("Failed to load configurations with error: %s\n", ex.getMessage());
         } finally {
@@ -176,7 +176,7 @@ public class SimulationConfigurationPresenter {
             setConfigurationFields(modelConfiguration);
             logInfo("Successfully loaded configuration");
 
-        } catch (Exception ex) {
+        } catch (Exception ex) { // ?
             logError("Failed to load configuration");
             System.out.printf("Failed to load configuration with error: %s\n", ex.getMessage());
         }
@@ -371,4 +371,4 @@ public class SimulationConfigurationPresenter {
         informationLabel.setTextFill(Color.BLACK);
         informationLabel.setText(message);
     }
-}
+} // duża ta klasa

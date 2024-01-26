@@ -14,7 +14,7 @@ public enum Gene {
 
     public Gene getNewRandom(){
         int index = ThreadLocalRandom.current().nextInt(0, values().length);
-        while(index == this.ordinal())
+        while(index == this.ordinal()) //do-while
             index = ThreadLocalRandom.current().nextInt(0, values().length);
 
         return values()[index];

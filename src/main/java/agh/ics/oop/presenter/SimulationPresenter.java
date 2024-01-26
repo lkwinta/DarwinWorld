@@ -295,4 +295,4 @@ public class SimulationPresenter {
     public void setupWaterStatistics(boolean waterCountVisible){
         statisticsViewController.setWaterLabelEnabled(waterCountVisible);
     }
-}
+} // duża ta klasa

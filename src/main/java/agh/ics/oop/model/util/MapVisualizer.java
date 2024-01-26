@@ -10,7 +10,7 @@ import agh.ics.oop.model.world_map.AbstractWorldMap;
  *
  * @author apohllo, idzik
  */
-public class MapVisualizer {
+public class MapVisualizer { // używana klasa?
     private static final String EMPTY_CELL = " ";
     private static final String FRAME_SEGMENT = "-";
     private static final String CELL_SEGMENT = "|";
