@@ -12,8 +12,8 @@ public class MathUtil {
         );
     }
 
-    public static double clamp(double x, double a, double b) { // x, a i b to nie są czytelne nazwy
-        if (x < a) return a;
-        return Math.min(x, b);
+    public static double clamp(double value, double range_start, double range_end) {
+        if (value < range_start) return range_start;
+        return Math.min(value, range_end);
     }
 }

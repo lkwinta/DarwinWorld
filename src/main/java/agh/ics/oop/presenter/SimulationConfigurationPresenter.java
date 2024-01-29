@@ -107,7 +107,7 @@ public class SimulationConfigurationPresenter {
             ConfigurationManager.loadConfigurationsFromFile();
             configurationsListView.getItems().addAll(ConfigurationManager.getConfigurationNames());
 
-        } catch (Exception ex) { // ?
+        } catch (IOException ex) {
             logError("Failed to load configurations");
             System.out.printf("Failed to load configurations with error: %s\n", ex.getMessage());
         } finally {
