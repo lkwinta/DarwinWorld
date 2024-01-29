@@ -256,7 +256,7 @@ public class Simulation implements Runnable {
         animalsSet.forEach(Animal::age);
     }
 
-    private void processOceansSpreading() {
+    private void processOceansSpreading() { // czy to jest zadanie symulacji?
         Pair<Collection<Vector2d>, Collection<Vector2d>> changedWaterPositions = waterGenerator.generateSpreadPositions();
 
         changedWaterPositions.getValue0().stream()
@@ -296,4 +296,4 @@ public class Simulation implements Runnable {
         if(listeners.containsKey(event))
             listeners.get(event).forEach((listener) -> listener.onSimulationEvent(this));
     }
-}
+} // duża ta klasa

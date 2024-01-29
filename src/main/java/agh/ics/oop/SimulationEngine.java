@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @SuppressWarnings("unused")
-public class SimulationEngine {
+public class SimulationEngine { // czy to jest do czegoś potrzebne?
     private final List<Simulation> simulationList;
     private final List<Thread> simulationThreadsList;
 
