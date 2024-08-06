@@ -1,4 +1,4 @@
-https://stackoverflow.com/questions/1005073/initialization-of-an-arraylist-in-one-line# DarwinWorld Project
+# DarwinWorld Project
 
 1. Imię i nazwisko: Łukasz Kwinta
 2. Numer grupy: Grupa nr 3 - Piątek 8:00
