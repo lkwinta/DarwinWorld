@@ -16,7 +16,7 @@ To run project use:
 .\gradlew run 
 ```
 
-All commands should be run in main repositories directory.
+All commands should be run in main repositories' directory.
 
 # Troubleshooting
 Project requires Java in version 17. You can use `java --version` in terminal to verify if you have Java JDK at version 17 installed. <br>
@@ -31,3 +31,8 @@ Gradle needs internet connection to download required dependencies:
 There is a chance that you can encouter issues with configuration saving. Sometimes gradle decides to copy resource files to source again and overwrite
 saved configuration. I was not able to solve the issue yet. Also configuration solving doesn't work after packing project into jar archive - jar archives are
 read only.
+
+# Screenshots
+![](configuration.png "Configuration Window")
+![](small_map.png "Example of small map")
+![](large_map.png "Example of large map")
